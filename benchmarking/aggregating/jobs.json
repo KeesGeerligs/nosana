@@ -1,0 +1,152 @@
+[
+  {
+    "job_id": "FmKSxEiSVEy9JFhzRwi4fSPfYzCwwHF1jTYPDUzWneKD",
+    "node": "HN2tKf26EDoAvigT7H7nj4y7CNHTXDQSKwaaZTDLYtEG",
+    "data": {
+      "specs": {
+        "gpu_info": "NVIDIA GeForce RTX 3060",
+        "cpu_info": "AMD Ryzen 5 5500",
+        "os_version": "Ubuntu 22.04.4 LTS",
+        "gpu_memory_total": "12288.0 MB",
+        "gpu_memory_free": "6659.0 MB",
+        "gpu_memory_used": "5457.0 MB",
+        "gpu_load": "20.0%",
+        "gpu_temperature": "40.0°C",
+        "driver": "552.22",
+        "internet_speed_test": {
+          "download_speed": "64.12 Mbps",
+          "upload_speed": "105.97 Mbps",
+          "duration": "23.39 seconds"
+        }
+      },
+      "performance": [
+        {
+          "Benchmark1": {
+            "gemma": {
+              "totalInferenceSeconds": "69.946s",
+              "producedTokens": 2535,
+              "decodingSeconds": "68.735s",
+              "tokensPerSecond": "36.881 tokens/s"
+            },
+            "phi3": {
+              "totalInferenceSeconds": "39.509s",
+              "producedTokens": 2712,
+              "decodingSeconds": "38.725s",
+              "tokensPerSecond": "70.032 tokens/s"
+            },
+            "mistral": {
+              "totalInferenceSeconds": "51.745s",
+              "producedTokens": 2540,
+              "decodingSeconds": "50.758s",
+              "tokensPerSecond": "50.042 tokens/s"
+            },
+            "llama3": {
+              "totalInferenceSeconds": "80.808s",
+              "producedTokens": 3002,
+              "decodingSeconds": "79.815s",
+              "tokensPerSecond": "37.612 tokens/s"
+            },
+            "qwen": {
+              "totalInferenceSeconds": "26.343s",
+              "producedTokens": 1159,
+              "decodingSeconds": "25.256s",
+              "tokensPerSecond": "45.890 tokens/s"
+            }
+          }
+        },
+        {
+          "Benchmark2": {
+            "gemma": {
+              "totalInferenceSeconds": "68.350s",
+              "producedTokens": 2166,
+              "decodingSeconds": "67.541s",
+              "tokensPerSecond": "32.069 tokens/s"
+            },
+            "phi3": {
+              "totalInferenceSeconds": "44.078s",
+              "producedTokens": 2659,
+              "decodingSeconds": "43.544s",
+              "tokensPerSecond": "61.065 tokens/s"
+            },
+            "mistral": {
+              "totalInferenceSeconds": "59.366s",
+              "producedTokens": 2574,
+              "decodingSeconds": "58.308s",
+              "tokensPerSecond": "44.145 tokens/s"
+            },
+            "llama3": {
+              "totalInferenceSeconds": "61.206s",
+              "producedTokens": 2719,
+              "decodingSeconds": "59.863s",
+              "tokensPerSecond": "45.420 tokens/s"
+            },
+            "qwen": {
+              "totalInferenceSeconds": "34.242s",
+              "producedTokens": 1490,
+              "decodingSeconds": "32.934s",
+              "tokensPerSecond": "45.242 tokens/s"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "job_id": "iGP3Z9HJ4T5tL5zkqPACTGaMDYc3CTJgfZdqEJccBPJ",
+    "node": "FLYaQLt7gZnj5btLGPfQcLrH9RLz25PK7tmsfDKTNwoB",
+    "data": {
+      "specs": {
+        "gpu_info": "NVIDIA GeForce RTX 3090 Ti",
+        "cpu_info": "AMD Ryzen 9 3950X 16-Core Processor",
+        "os_version": "Ubuntu 22.04.4 LTS",
+        "gpu_memory_total": "24564.0 MB",
+        "gpu_memory_free": "23460.0 MB",
+        "gpu_memory_used": "854.0 MB",
+        "gpu_load": "0.0%",
+        "gpu_temperature": "37.0°C",
+        "driver": "552.12",
+        "internet_speed_test": {
+          "download_speed": "325.71 Mbps",
+          "upload_speed": "153.23 Mbps",
+          "duration": "19.85 seconds"
+        }
+      },
+      "performance": [
+        {
+          "Benchmark1": {
+            "gemma": {
+              "totalInferenceSeconds": "0.828s",
+              "producedTokens": 47,
+              "decodingSeconds": "0.503s",
+              "tokensPerSecond": "93.446 tokens/s"
+            },
+            "phi3": {
+              "totalInferenceSeconds": "1.305s",
+              "producedTokens": 151,
+              "decodingSeconds": "1.049s",
+              "tokensPerSecond": "143.922 tokens/s"
+            },
+            "mistral": {
+              "totalInferenceSeconds": "2.738s",
+              "producedTokens": 258,
+              "decodingSeconds": "2.328s",
+              "tokensPerSecond": "110.843 tokens/s"
+            },
+            "llama3": {
+              "totalInferenceSeconds": "3.687s",
+              "producedTokens": 309,
+              "decodingSeconds": "3.342s",
+              "tokensPerSecond": "92.450 tokens/s"
+            },
+            "qwen": {
+              "totalInferenceSeconds": "3.264s",
+              "producedTokens": 257,
+              "decodingSeconds": "2.888s",
+              "tokensPerSecond": "88.992 tokens/s"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

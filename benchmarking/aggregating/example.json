@@ -1,0 +1,2229 @@
+{
+    "FmKSxEiSVEy9JFhzRwi4fSPfYzCwwHF1jTYPDUzWneKD": {
+        "ipfsJob": "QmVdXPj2E1TVCrrCxBvho7xqK91YU2iiqvChWeQCsBtHdq",
+        "ipfsResult": "QmXz9bbGY7FGVgU39HCufswQLCp6nArzxAghwQhzosSrr4",
+        "market": "7AtiXMSH6R1jjBxrcYjehCkkSF7zvYWte63gwEDBcGHq",
+        "node": "HN2tKf26EDoAvigT7H7nj4y7CNHTXDQSKwaaZTDLYtEG",
+        "payer": "3YNsCSZE1G7Z88BTzzFcrv8kwJ5vvAewQLa5tyBdBUz8",
+        "price": "0f",
+        "project": "3YNsCSZE1G7Z88BTzzFcrv8kwJ5vvAewQLa5tyBdBUz8",
+        "state": "COMPLETED",
+        "timeEnd": 1715783731,
+        "timeStart": 1715781092,
+        "result": {
+            "status": "success",
+            "startTime": 1715781173901,
+            "endTime": 1715783708351,
+            "opStates": [
+                {
+                    "operationId": "ollama",
+                    "providerId": "ss0qmud4eelyavcoj351pmjkm10i5923",
+                    "status": "success",
+                    "startTime": 1715781174263,
+                    "endTime": 1715783707269,
+                    "exitCode": 0,
+                    "logs": [
+                        {
+                            "type": "stdout",
+                            "log": "Starting Ollama Benchmark Service\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "-------Linux----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'id': '0', 'name': 'NVIDIA GeForce RTX 3060', 'driver': '552.22', 'gpu_memory_total': '12288.0 MB', 'gpu_memory_free': '6659.0 MB', 'gpu_memory_used': '5457.0 MB', 'gpu_load': '20.0%', 'gpu_temperature': '40.0°C'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Only one GPU card\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total memory size : 15.57 GB\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "cpu_info: AMD Ryzen 5 5500\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "gpu_info: NVIDIA GeForce RTX 3060\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "os_version: \"Ubuntu 22.04.4 LTS\"\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Internet speed test: \n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Download Speed: 64.12 Mbps\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Upload Speed: 105.97 Mbps\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Internet speed test duration: 23.39 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "ollama_version: 0.1.37 \n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running LLM benchmarks 1\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Gemma Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "gemma:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.78 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: gemma:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 1.585s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 55\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 1.284s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 42.831\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 11.619s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 465\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 11.383s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 40.850\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 10.659s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 429\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 10.443s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 41.082\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 34.129s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 1106\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 33.902s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 32.623\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 11.954s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 480\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 11.723s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 40.945\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model gemma:7b: 36.881 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for gemma:7b: {'average_token_per_second': '36.881 tokens/s', 'total_tokens': 2535, 'total_decoding_seconds': '68.735s', 'total_inference_seconds': '69.946s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'gemma:7b': {'average_token_per_second': '36.881 tokens/s', 'total_tokens': 2535, 'total_decoding_seconds': '68.735s', 'total_inference_seconds': '69.946s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Phi3 Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "phi3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 2.17 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: phi3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 3.066s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 215\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 2.960s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 72.644\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 5.161s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 356\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 4.983s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 71.440\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 10.648s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 729\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 10.470s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 69.628\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 13.336s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 908\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 13.179s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 68.900\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 7.299s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 504\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 7.134s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 70.650\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model phi3: 70.032 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for phi3: {'average_token_per_second': '70.032 tokens/s', 'total_tokens': 2712, 'total_decoding_seconds': '38.725s', 'total_inference_seconds': '39.509s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'phi3': {'average_token_per_second': '70.032 tokens/s', 'total_tokens': 2712, 'total_decoding_seconds': '38.725s', 'total_inference_seconds': '39.509s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Mistral Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "mistral\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.24 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: mistral\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 5.638s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 270\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 5.334s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 50.615\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 9.643s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 473\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 9.472s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 49.936\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 12.673s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 624\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 12.506s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 49.897\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 14.470s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 714\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 14.302s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 49.923\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 9.320s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 459\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 9.143s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 50.201\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model mistral: 50.042 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for mistral: {'average_token_per_second': '50.042 tokens/s', 'total_tokens': 2540, 'total_decoding_seconds': '50.758s', 'total_inference_seconds': '51.745s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'mistral': {'average_token_per_second': '50.042 tokens/s', 'total_tokens': 2540, 'total_decoding_seconds': '50.758s', 'total_inference_seconds': '51.745s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running LLama3 Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "llama3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.64 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: llama3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 13.527s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 420\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 13.111s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 32.034\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 18.499s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 693\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 18.287s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 37.896\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 15.728s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 707\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 15.607s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.299\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 21.601s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 673\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 21.477s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 31.336\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 11.453s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 509\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 11.333s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 44.914\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model llama3: 37.612 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for llama3: {'average_token_per_second': '37.612 tokens/s', 'total_tokens': 3002, 'total_decoding_seconds': '79.815s', 'total_inference_seconds': '80.808s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'llama3': {'average_token_per_second': '37.612 tokens/s', 'total_tokens': 3002, 'total_decoding_seconds': '79.815s', 'total_inference_seconds': '80.808s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Qwen\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "qwen:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.49 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: qwen:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 5.069s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 223\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 4.896s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.548\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 1.953s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 81\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 1.722s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 47.049\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 7.399s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 328\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 7.172s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.735\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 5.617s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 248\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 5.390s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 46.010\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 6.305s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 279\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 6.077s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.913\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model qwen:7b: 45.890 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for qwen:7b: {'average_token_per_second': '45.890 tokens/s', 'total_tokens': 1159, 'total_decoding_seconds': '25.256s', 'total_inference_seconds': '26.343s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'qwen:7b': {'average_token_per_second': '45.890 tokens/s', 'total_tokens': 1159, 'total_decoding_seconds': '25.256s', 'total_inference_seconds': '26.343s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "finished benchmarking\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running LLM benchmarks 2\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Gemma Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "gemma:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.81 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: gemma:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 1.454s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 50\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 1.169s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 42.764\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 10.308s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 415\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 10.171s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 40.802\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 11.522s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 465\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 11.396s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 40.802\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 28.851s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 698\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 28.714s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 24.308\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 16.216s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 538\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 16.090s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 33.436\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model gemma:7b: 32.069 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for gemma:7b: {'average_token_per_second': '32.069 tokens/s', 'total_tokens': 2166, 'total_decoding_seconds': '67.541s', 'total_inference_seconds': '68.350s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'gemma:7b': {'average_token_per_second': '32.069 tokens/s', 'total_tokens': 2166, 'total_decoding_seconds': '67.541s', 'total_inference_seconds': '68.350s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Phi3 Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "phi3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 2.28 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: phi3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 2.254s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 158\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 2.152s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 73.425\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 4.233s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 297\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 4.126s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 71.983\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 17.258s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 797\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 17.154s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 46.462\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 10.593s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 732\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 10.484s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 69.819\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 9.741s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 675\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 9.628s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 70.109\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model phi3: 61.065 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for phi3: {'average_token_per_second': '61.065 tokens/s', 'total_tokens': 2659, 'total_decoding_seconds': '43.544s', 'total_inference_seconds': '44.078s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'phi3': {'average_token_per_second': '61.065 tokens/s', 'total_tokens': 2659, 'total_decoding_seconds': '43.544s', 'total_inference_seconds': '44.078s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Mistral Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "mistral\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.50 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: mistral\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 4.657s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 222\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 4.360s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 50.915\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 6.919s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 341\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 6.745s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 50.553\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 18.944s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 743\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 18.774s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 39.576\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 18.502s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 758\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 18.252s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 41.529\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 10.343s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 510\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 10.176s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 50.119\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model mistral: 44.145 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for mistral: {'average_token_per_second': '44.145 tokens/s', 'total_tokens': 2574, 'total_decoding_seconds': '58.308s', 'total_inference_seconds': '59.366s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'mistral': {'average_token_per_second': '44.145 tokens/s', 'total_tokens': 2574, 'total_decoding_seconds': '58.308s', 'total_inference_seconds': '59.366s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running LLama3 Small\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "llama3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.72 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: llama3\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 8.042s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 349\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 7.602s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.908\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 12.118s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 539\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 11.881s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.366\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 13.521s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 603\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 13.303s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.329\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 14.882s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 665\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 14.663s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.352\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 12.643s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 563\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 12.414s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.353\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model llama3: 45.420 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for llama3: {'average_token_per_second': '45.420 tokens/s', 'total_tokens': 2719, 'total_decoding_seconds': '59.863s', 'total_inference_seconds': '61.206s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'llama3': {'average_token_per_second': '45.420 tokens/s', 'total_tokens': 2719, 'total_decoding_seconds': '59.863s', 'total_inference_seconds': '61.206s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Running Qwen\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Checking and pulling the following LLM models\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "qwen:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Model pulling time: 3.61 seconds\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Starting evaluation for model: qwen:7b\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 1/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 3.996s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 164\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 3.579s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.824\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 2/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 3.616s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 155\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 3.382s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.825\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 3/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 9.761s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 432\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 9.546s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.255\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 4/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 13.011s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 577\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 12.794s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 45.099\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Evaluating prompt 5/5\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Total Inference Seconds: 3.858s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Produced Tokens: 162\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Decoding Seconds: 3.633s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Tokens/Second: 44.593\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Average evaluation rate for model qwen:7b: 45.242 tokens/s\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "Results for qwen:7b: {'average_token_per_second': '45.242 tokens/s', 'total_tokens': 1490, 'total_decoding_seconds': '32.934s', 'total_inference_seconds': '34.242s'}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "----------\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "{'qwen:7b': {'average_token_per_second': '45.242 tokens/s', 'total_tokens': 1490, 'total_decoding_seconds': '32.934s', 'total_inference_seconds': '34.242s'}}\n"
+                        },
+                        {
+                            "type": "stdout",
+                            "log": "finished benchmarking\n"
+                        }
+                    ],
+                    "results": {
+                        "gemma_results": [
+                            "{'average_token_per_second': '36.881 tokens/s', 'total_tokens': 2535, 'total_decoding_seconds': '68.735s', 'total_inference_seconds': '69.946s'}",
+                            "{'average_token_per_second': '32.069 tokens/s', 'total_tokens': 2166, 'total_decoding_seconds': '67.541s', 'total_inference_seconds': '68.350s'}"
+                        ],
+                        "gemma_averages": [
+                            "Average evaluation rate for model gemma:7b: 36.881 tokens/s",
+                            "Average evaluation rate for model gemma:7b: 32.069 tokens/s"
+                        ],
+                        "phi3_results": [
+                            "{'average_token_per_second': '70.032 tokens/s', 'total_tokens': 2712, 'total_decoding_seconds': '38.725s', 'total_inference_seconds': '39.509s'}",
+                            "{'average_token_per_second': '61.065 tokens/s', 'total_tokens': 2659, 'total_decoding_seconds': '43.544s', 'total_inference_seconds': '44.078s'}"
+                        ],
+                        "phi3_averages": [
+                            "Average evaluation rate for model phi3: 70.032 tokens/s",
+                            "Average evaluation rate for model phi3: 61.065 tokens/s"
+                        ],
+                        "mistral_results": [
+                            "{'average_token_per_second': '50.042 tokens/s', 'total_tokens': 2540, 'total_decoding_seconds': '50.758s', 'total_inference_seconds': '51.745s'}",
+                            "{'average_token_per_second': '44.145 tokens/s', 'total_tokens': 2574, 'total_decoding_seconds': '58.308s', 'total_inference_seconds': '59.366s'}"
+                        ],
+                        "mistral_averages": [
+                            "Average evaluation rate for model mistral: 50.042 tokens/s",
+                            "Average evaluation rate for model mistral: 44.145 tokens/s"
+                        ],
+                        "llama3_results": [
+                            "{'average_token_per_second': '37.612 tokens/s', 'total_tokens': 3002, 'total_decoding_seconds': '79.815s', 'total_inference_seconds': '80.808s'}",
+                            "{'average_token_per_second': '45.420 tokens/s', 'total_tokens': 2719, 'total_decoding_seconds': '59.863s', 'total_inference_seconds': '61.206s'}"
+                        ],
+                        "llama3_averages": [
+                            "Average evaluation rate for model llama3: 37.612 tokens/s",
+                            "Average evaluation rate for model llama3: 45.420 tokens/s"
+                        ],
+                        "qwen_results": [
+                            "{'average_token_per_second': '45.890 tokens/s', 'total_tokens': 1159, 'total_decoding_seconds': '25.256s', 'total_inference_seconds': '26.343s'}",
+                            "{'average_token_per_second': '45.242 tokens/s', 'total_tokens': 1490, 'total_decoding_seconds': '32.934s', 'total_inference_seconds': '34.242s'}"
+                        ],
+                        "qwen_averages": [
+                            "Average evaluation rate for model qwen:7b: 45.890 tokens/s",
+                            "Average evaluation rate for model qwen:7b: 45.242 tokens/s"
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
