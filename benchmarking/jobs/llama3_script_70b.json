@@ -1,0 +1,22 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "ollama",
+        "args": {
+          "cmd": ["1 1"], 
+          "image": "docker.io/k1llahkeezy/llama3_script:70b",
+          "gpu": true
+        },
+        "results": {
+          "llama3_70b_results": "(?<=Results for llama3:70b: ).*",
+          "system_specs": "(?<=system specs: ).*"
+      }
+      }
+    ]
+  }

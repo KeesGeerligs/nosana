@@ -1,0 +1,25 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "ollama",
+        "args": {
+          "cmd": [
+            "-c ",
+            "echo starting ollama;",
+            "ollama serve > /dev/null 2>&1 & sleep 1;",
+            "echo running llm_benchmark;",
+            "llm_bench run --model llama3-large"
+          ], 
+          "entrypoint": "/bin/sh",
+          "image": "k1llahkeezy/llama3:70b",
+          "gpu": true
+        }
+      }
+    ]
+  }
