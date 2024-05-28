@@ -12,4 +12,4 @@ RUN ollama serve > /dev/null 2>&1 & \
     
 ADD start_benchmark.sh start_benchmark.sh
 
-ENTRYPOINT [ "bash", "./start_benchmark.sh" ] 
+ENTRYPOINT [ "bash", "./start_benchmark_llama3_70b.sh" ] 
