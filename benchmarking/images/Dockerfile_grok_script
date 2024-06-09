@@ -10,6 +10,6 @@ RUN ollama serve > /dev/null 2>&1 & \
     sleep 20 && \
     ollama pull jmorgan/grok
     
-ADD start_benchmark.sh start_benchmark.sh
+ADD start_benchmark_grok.sh start_benchmark_grok.sh
 
-ENTRYPOINT [ "bash", "./start_benchmark_grok.sh.sh" ] 
+ENTRYPOINT [ "bash", "./start_benchmark_grok.sh" ] 

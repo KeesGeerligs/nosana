@@ -1,0 +1,22 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run", 
+        "id": "ollama",
+        "args": {
+          "cmd": ["1 1"], 
+          "image": "docker.io/k1llahkeezy/grok_script_3",
+          "gpu": true
+        },
+        "results": {
+          "grok_results": "(?<=Results for grok: ).*",
+          "system_specs": "(?<=system specs: ).*"
+      }
+      }
+    ]
+  }
