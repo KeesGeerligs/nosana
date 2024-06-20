@@ -1,0 +1,18 @@
+{
+    "version": "0.1",
+   "type": "container",
+   "meta": {
+     "trigger": "cli"
+   },
+   "ops": [
+     {
+       "type": "container/run",
+       "id": "run-webui",
+       "args": {
+         "cmd": ["-c ","./webui.sh"],
+         "image": "docker.io/k1llahkeezy/webui4",
+         "gpu": true
+       }
+     }
+   ]
+ }
