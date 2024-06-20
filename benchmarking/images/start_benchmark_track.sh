@@ -12,7 +12,21 @@ llm_bench sysinfo
 llm_bench check-internet
 llm_bench check-version
 
-while (( ((TIMEOUT_MINS - LAST_RUN_LENGTH_MINS) - (($(date +%s) - JOB_START_TIMESTAMP) / 60)) >= 0));
+monitor_gpu_usage() {
+  while true; do
+    echo "Timestamp: $(date)"
+    echo "Ollama PS output:"
+    ollama ps
+    echo "GPU Power Consumption:"
+    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    sleep 10
+  done
+}
+
+# Ensure the monitor process is killed on script exit
+trap "kill 0" EXIT
+
+while (( ((TIMEOUT_MINS - LAST_RUN_LENGTH_MINS) - (($(date +%s) - JOB_START_TIMESTAMP) / 60)) >= 0 ));
 do
   ATLEAST_ONE_SUCCESS=false
   RUN_START_TIMESTAMP=$(date +%s)
@@ -22,47 +36,46 @@ do
   if llm_bench run --model gemma-small --test &>/dev/null; then
     echo "Running Gemma Small"
     ATLEAST_ONE_SUCCESS=true
-    ollama ps
-    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    monitor_gpu_usage | tee /dev/fd/1 &  # Start monitoring in the background and capture output
+    MONITOR_PID=$!
     llm_bench run --model gemma-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
-
-  # llm_bench sysinfo
 
   if llm_bench run --model phi3-small --test &>/dev/null; then
     echo "Running Phi3 Small"
     ATLEAST_ONE_SUCCESS=true
-    ollama ps
-    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    monitor_gpu_usage | tee /dev/fd/1 &  # Start monitoring in the background and capture output
+    MONITOR_PID=$!
     llm_bench run --model phi3-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
-  # llm_bench sysinfo
   if llm_bench run --model mistral-small --test &>/dev/null; then
     echo "Running Mistral Small"
     ATLEAST_ONE_SUCCESS=true
-    ollama ps
-    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    monitor_gpu_usage | tee /dev/fd/1 &  # Start monitoring in the background and capture output
+    MONITOR_PID=$!
     llm_bench run --model mistral-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
-
-  # llm_bench sysinfo
   if llm_bench run --model llama3-small --test &>/dev/null; then
     echo "Running LLama3 Small"
     ATLEAST_ONE_SUCCESS=true
-    ollama ps
-    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    monitor_gpu_usage | tee /dev/fd/1 &  # Start monitoring in the background and capture output
+    MONITOR_PID=$!
     llm_bench run --model llama3-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
-  # llm_bench sysinfo
   if llm_bench run --model qwen-small --test &>/dev/null; then
     echo "Running Qwen"
     ATLEAST_ONE_SUCCESS=true
-    ollama ps
-    nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+    monitor_gpu_usage | tee /dev/fd/1 &  # Start monitoring in the background and capture output
+    MONITOR_PID=$!
     llm_bench run --model qwen-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   echo "finished benchmarking"
@@ -70,9 +83,9 @@ do
   if [[ $ATLEAST_ONE_SUCCESS == true ]]; then
     ITERATION=$((ITERATION + 1))
     RUN_END_TIMESTAMP=$(date +%s)
-    RUN_TIME_IN_SECONDS=$(($RUN_END_TIMESTAMP-$RUN_START_TIMESTAMP))
+    RUN_TIME_IN_SECONDS=$(($RUN_END_TIMESTAMP - $RUN_START_TIMESTAMP))
     LAST_RUN_LENGTH_MINS=$(($RUN_TIME_IN_SECONDS / 60))
   else
-    LAST_RUN_LENGTH_MINS=TIMEOUT_MINS
+    LAST_RUN_LENGTH_MINS=$TIMEOUT_MINS
   fi  
 done
