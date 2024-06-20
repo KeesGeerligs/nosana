@@ -60,7 +60,6 @@ do
   if llm_bench run --model qwen-small --test &>/dev/null; then
     echo "Running Qwen"
     ATLEAST_ONE_SUCCESS=true
-    echo "pizza"
     ollama ps
     nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
     llm_bench run --model qwen-small --steps ${ITERATION_STEPS}
