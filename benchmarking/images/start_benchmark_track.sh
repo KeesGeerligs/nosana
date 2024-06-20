@@ -13,11 +13,13 @@ llm_bench check-internet
 llm_bench check-version
 
 monitor_gpu_usage() {
-  echo "Timestamp: $(date)"
-  echo "Ollama PS output:"
-  ollama ps
-  echo "GPU Power Consumption:"
-  nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits
+  while true; do
+    echo "Ollama PS output:"
+    ollama ps
+    echo "GPU Power Consumption:"
+    nvidia-smi --query-gpu=power.draw --format=csv,noheader
+    sleep 10
+  done
 }
 
 # Ensure the monitor process is killed on script exit
@@ -33,36 +35,46 @@ do
   if llm_bench run --model gemma-small --test &>/dev/null; then
     echo "Running Gemma Small"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage  # Capture output once
+    monitor_gpu_usage &  # Start monitoring in the background
+    MONITOR_PID=$!
     llm_bench run --model gemma-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   if llm_bench run --model phi3-small --test &>/dev/null; then
     echo "Running Phi3 Small"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage  # Capture output once
+    monitor_gpu_usage &  # Start monitoring in the background
+    MONITOR_PID=$!
     llm_bench run --model phi3-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   if llm_bench run --model mistral-small --test &>/dev/null; then
     echo "Running Mistral Small"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage  # Capture output once
+    monitor_gpu_usage &  # Start monitoring in the background
+    MONITOR_PID=$!
     llm_bench run --model mistral-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   if llm_bench run --model llama3-small --test &>/dev/null; then
     echo "Running LLama3 Small"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage  # Capture output once
+    monitor_gpu_usage &  # Start monitoring in the background
+    MONITOR_PID=$!
     llm_bench run --model llama3-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   if llm_bench run --model qwen-small --test &>/dev/null; then
     echo "Running Qwen"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage  # Capture output once
+    monitor_gpu_usage &  # Start monitoring in the background
+    MONITOR_PID=$!
     llm_bench run --model qwen-small --steps ${ITERATION_STEPS}
+    kill $MONITOR_PID  # Stop monitoring
   fi
 
   echo "finished benchmarking"
