@@ -14,6 +14,5 @@ RUN ollama serve > /dev/null 2>&1 & \
     ollama pull gemma:7b && \
     ollama pull qwen:7b
 
-ADD start_benchmark.sh start_benchmark.sh
 
-ENTRYPOINT [ "bash", "./start_benchmark.sh" ] 
+ENTRYPOINT ["bash"] 
