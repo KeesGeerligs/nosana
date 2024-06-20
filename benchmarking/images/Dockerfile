@@ -15,4 +15,4 @@ RUN ollama serve > /dev/null 2>&1 & \
     ollama pull qwen:7b
 
 
-ENTRYPOINT ["bash"] 
+ENTRYPOINT ["/bin/bash"] 
