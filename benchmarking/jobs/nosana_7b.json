@@ -1,0 +1,28 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "ollama",
+        "args": {
+          "cmd": "bash -c 'curl -s https://your-script-hosting.com/path/to/start_benchmark.sh -o /tmp/start_benchmark.sh && chmod +x /tmp/start_benchmark.sh && /tmp/start_benchmark.sh 120 10'",
+          "image": "docker.io/nosana/ollama-7b:0.0.1",
+          "gpu": true,
+          "expose": 11434
+        },
+        "results": {
+          "gemma_results": "(?<=Results for gemma:7b: ).*",
+          "phi3_results": "(?<=Results for phi3: ).*",
+          "mistral_results": "(?<=Results for mistral: ).*",
+          "llama3_results": "(?<=Results for llama3: ).*",
+          "qwen_results": "(?<=Results for qwen:7b: ).*",
+          "system_specs": "(?<=system specs: ).*"
+        }
+      }
+    ]
+  }
+  
