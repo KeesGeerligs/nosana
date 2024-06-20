@@ -10,7 +10,7 @@
       "id": "ollama",
       "args": {
         "cmd": [
-            "-c 'curl -s https://raw.githubusercontent.com/KeesGeerligs/nosana/main/benchmarking/images/start_benchmark.sh -o /tmp/start_benchmark.sh && chmod +x /tmp/start_benchmark.sh && /tmp/start_benchmark.sh 120 10'"
+            "-c 'curl -s https://raw.githubusercontent.com/KeesGeerligs/nosana/main/benchmarking/images/command.sh -o /tmp/command.sh && chmod +x /tmp/command.sh && /tmp/command.sh'"
           ],
         "image": "docker.io/nosana/ollama-7b:0.0.1",
         "gpu": true,
