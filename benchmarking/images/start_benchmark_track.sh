@@ -22,7 +22,6 @@ monitor_gpu_usage() {
   done
 }
 
-# Ensure the monitor process is killed on script exit
 trap "kill 0" EXIT
 
 while (( ((TIMEOUT_MINS - LAST_RUN_LENGTH_MINS) - (($(date +%s) - JOB_START_TIMESTAMP) / 60)) >= 0 ));
@@ -35,10 +34,10 @@ do
   if llm_bench run --model gemma-small --test &>/dev/null; then
     echo "Running Gemma Small"
     ATLEAST_ONE_SUCCESS=true
-    monitor_gpu_usage &  # Start monitoring in the background
+    monitor_gpu_usage &  
     MONITOR_PID=$!
     llm_bench run --model gemma-small --steps ${ITERATION_STEPS}
-    kill $MONITOR_PID  # Stop monitoring
+    kill $MONITOR_PID  
   fi
 
   if llm_bench run --model phi3-small --test &>/dev/null; then
