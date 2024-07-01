@@ -1,0 +1,22 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "VLLM",
+      "args": {
+        "cmd": ["--model google/gemma-2b"],
+        "image": "vllm/vllm-openai:latest",
+        "gpu": true,
+        "expose": 8000,
+        "env": {
+          "HUGGING_FACE_HUB_TOKEN": "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"
+        }
+      }
+    }
+  ]
+}
