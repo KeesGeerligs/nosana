@@ -1,0 +1,25 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "Ollama",
+      "args": {
+        "cmd": [
+          "-c ",
+          "ollama serve > /dev/null 2>&1 & sleep 1;",
+          "ollama pull gemma:2b > /dev/null 2>&1;",
+          "wait $serve_pid"
+        ],
+        "entrypoint": "/bin/sh",
+        "image": "docker.io/ollama/ollama",
+        "gpu": true,
+        "expose": 11434
+      }
+    }
+  ]
+}

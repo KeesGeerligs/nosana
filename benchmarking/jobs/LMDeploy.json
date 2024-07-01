@@ -1,0 +1,22 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "LMDeploy",
+      "args": {
+        "cmd": ["lmdeploy serve api_server google/gemma-2b"],
+        "image": "docker.io/openmmlab/lmdeploy:latest",
+        "gpu": true,
+        "expose": 23333,
+        "env": {
+          "HUGGING_FACE_HUB_TOKEN": "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"
+        }
+      }
+    }
+  ]
+}
