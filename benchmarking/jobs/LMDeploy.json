@@ -9,7 +9,7 @@
       "type": "container/run",
       "id": "LMDeploy",
       "args": {
-        "cmd": ["lmdeploy serve api_server google/gemma-2b"],
+        "cmd": ["lmdeploy serve api_server microsoft/Phi-3-mini-4k-instruct"],
         "image": "docker.io/openmmlab/lmdeploy:latest",
         "gpu": true,
         "expose": 23333,
