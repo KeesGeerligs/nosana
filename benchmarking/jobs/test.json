@@ -18,8 +18,7 @@
           ], 
           "entrypoint": "/bin/sh",
           "image": "docker.io/ben1t0/benchmark:small",
-          "gpu": true,
-          "command": "--model google/gemma-2b"
+          "gpu": true
         }
       }
     ]
