@@ -9,7 +9,7 @@
       "type": "container/run",
       "id": "VLLM",
       "args": {
-        "cmd": ["--model google/gemma-2b"], 
+        "cmd": ["--model microsoft/Phi-3-mini-4k-instruct --max-model-len 512"], 
         "image": "vllm/vllm-openai:latest",
         "gpu": true,
         "expose": 8000,

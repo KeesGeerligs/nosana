@@ -8,7 +8,7 @@ from collections import defaultdict
 import numpy as np
 import contextlib
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import pandas as pd
 
 class MetricsCollector:
     def __init__(self):
@@ -56,7 +56,7 @@ class MetricsCollector:
         self.total_tokens += count
         self.response_word_bucket[int(time.time())] += count
 
-    async def report_loop(self, time_window=3):
+    async def report_loop(self, time_window=10):
         while True:
             await asyncio.sleep(time_window)
             current_time = time.time()
@@ -86,6 +86,16 @@ class MetricsCollector:
         print(f"Total Tokens per Second: {self.total_tokens / total_duration}")
         print(f"Total Requests Made: {self.total_requests}")
 
+    def save_to_excel(self, filename="metrics_report.xlsx"):
+        data = {
+            'Time (seconds)': self.time_series,
+            'Tokens per Second': self.tokens_per_second_series
+        }
+        df = pd.DataFrame(data)
+        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Tokens_Per_Second')
+        print(f"Metrics saved to {filename}")
+
     def plot(self):
         plt.figure(figsize=(10, 5))
         plt.plot(self.time_series, self.tokens_per_second_series, label='Tokens/s')
@@ -95,6 +105,7 @@ class MetricsCollector:
         plt.legend()
         plt.grid(True)
         plt.show()
+        self.save_to_excel()
 
 class User:
     def __init__(self, session, base_url, framework, model, collector, prompts, user_id):
@@ -107,6 +118,7 @@ class User:
         self.user_id = user_id
         self.tokens = 0
         self.start_time = time.time()
+        self.first_request_printed = False  # Flag to ensure the first request is printed only once
 
     async def make_request(self):
         while True:
@@ -116,7 +128,7 @@ class User:
                 data = {
                     "model": self.model,
                     "prompt": prompt['instruction'] + " " + prompt['context'],
-                    "max_tokens": 512,
+                    "max_tokens": 50,
                     "temperature": 0.7,
                     "top_p": 0.9,
                     "n": 1,
@@ -127,23 +139,52 @@ class User:
                 data = {
                     "model": self.model,
                     "prompt": prompt['instruction'] + " " + prompt['context'],
-                    "stream": False
+                    "stream": False,
+                    "num_predict": 50
                 }
             else:
                 raise ValueError("Unsupported framework")
 
             headers = {"Content-Type": "application/json"}
-            with self.collector.collect_http_request(), self.collector.collect_user():
-                start_time = time.time()
-                async with self.session.post(url, headers=headers, json=data) as response:
-                    self.collector.collect_response_status(response.status)
-                    if response.status == 200:
-                        response_text = await response.text()
-                        tokens = len(response_text.split())
-                        self.collector.collect_tokens(tokens)
-                        self.tokens += tokens
-                        self.collector.collect_response_head_latency(time.time() - start_time)
+
+            # Print the first cURL request
+            if not self.first_request_printed:
+                json_data = json.dumps(data).replace('"', '\\"')
+                curl_command = f"curl -X POST {url} -H \"Content-Type: application/json\" -d \"{json_data}\""
+                print(f"First cURL Request: {curl_command}")
+                self.first_request_printed = True
+
+            try:
+                with self.collector.collect_http_request(), self.collector.collect_user():
+                    start_time = time.time()
+                    async with self.session.post(url, headers=headers, json=data) as response:
+                        self.collector.collect_response_status(response.status)
+                        if response.status == 200:
+                            response_text = await response.text()  # Ensure proper parsing
+                            print(f"Response Text: {response_text}")  # Debugging: print raw response text
+                            response_json = await response.json()
+                            print(f"Response JSON: {response_json}")  # Debugging: print response JSON
+                            tokens = self.parse_response(response_json)
+                            self.collector.collect_tokens(tokens)
+                            self.tokens += tokens
+                            self.collector.collect_response_head_latency(time.time() - start_time)
+                        else:
+                            print(f"Received non-200 response: {response.status}")
+            except Exception as e:
+                print(f"Request failed: {e}")
             await asyncio.sleep(random.uniform(0.1, 1))  # Simulate variable request timing
+
+    def parse_response(self, response):
+        # Adjust parsing logic based on the actual response structure
+        try:
+            if self.framework == 'vllm':
+                return len(response['choices'][0]['text'].split())
+            elif self.framework == 'ollama':
+                if 'response' in response:
+                    return len(response['response'].split())
+        except KeyError as e:
+            print(f"Error parsing response: {e}")
+        return 0
 
     def report_individual_tokens(self):
         duration = time.time() - self.start_time
