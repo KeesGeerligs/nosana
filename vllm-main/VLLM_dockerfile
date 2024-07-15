@@ -1,3 +1,0 @@
-FROM vllm/vllm-openai:latest
-
-ENTRYPOINT ["timeout", "20m"]
