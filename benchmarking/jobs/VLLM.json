@@ -9,7 +9,12 @@
       "type": "container/run",
       "id": "VLLM",
       "args": {
-        "cmd": ["--model microsoft/Phi-3-mini-4k-instruct --max-model-len 512"], 
+        "cmd": [
+          "-c ",
+          "timeout 90m",
+          " python3 -m vllm.entrypoints.openai.api_server",
+          " ---model meta-llama/Meta-Llama-3-70B-Instruct"], 
+        "entrypoint": "/bin/sh",
         "image": "vllm/vllm-openai:latest",
         "gpu": true,
         "expose": 8000,

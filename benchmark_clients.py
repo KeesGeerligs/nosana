@@ -134,7 +134,7 @@ class User:
                 data = {
                     "model": self.model,
                     "prompt": prompt['instruction'] + " " + prompt['context'],
-                    "max_tokens": 50,
+                    "max_tokens": 512,
                     "temperature": 0.7,
                     "top_p": 0.9,
                     "n": 1,
@@ -146,7 +146,7 @@ class User:
                     "model": self.model,
                     "prompt": prompt['instruction'] + " " + prompt['context'],
                     "stream": False,
-                    "num_predict": 50
+                    "num_predict": 512
                 }
             else:
                 raise ValueError("Unsupported framework")
@@ -189,7 +189,7 @@ class User:
             except Exception as e:
                 print(f"User {self.user_id} Request {self.request_count} failed: {e}")
             
-            await asyncio.sleep(random.uniform(0.1, 1))  # Simulate variable request timing
+            await asyncio.sleep(0.01)  # Simulate variable request timing
 
     def report_individual_tokens(self):
         duration = time.time() - self.start_time
