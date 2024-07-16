@@ -11,9 +11,9 @@
       "args": {
         "cmd": [
           "-c ",
-          "timeout 90m",
+          "timeout 110m",
           " python3 -m vllm.entrypoints.openai.api_server",
-          " ---model meta-llama/Meta-Llama-3-70B-Instruct"], 
+          " --model meta-llama/Meta-Llama-3-70B-Instruct"], 
         "entrypoint": "/bin/sh",
         "image": "vllm/vllm-openai:latest",
         "gpu": true,

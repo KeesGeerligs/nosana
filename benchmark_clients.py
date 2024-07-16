@@ -122,9 +122,9 @@ class User:
         self.user_id = user_id
         self.tokens = 0
         self.start_time = time.time()
-        self.first_request_printed = False  # Flag to ensure the first request is printed only once
-        self.request_count = 0  # Counter for the number of requests made
-        self.empty_response_count = 0  # Counter for requests that didn't output tokens
+        self.first_request_printed = False  
+        self.request_count = 0  
+        self.empty_response_count = 0  
 
     async def make_request(self):
         while True:
