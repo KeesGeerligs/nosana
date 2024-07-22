@@ -20,7 +20,7 @@
         "gpu": true,
         "expose": 11434,
         "env": {
-          "OLLAMA_NUM_PARALLEL": "10"
+          "OLLAMA_NUM_PARALLEL": "100"
         }
       }
     }
