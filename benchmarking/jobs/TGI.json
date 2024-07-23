@@ -7,17 +7,13 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "LMDeploy",
+      "id": "TextGenerationInference",
       "args": {
         "cmd": [
-          "-c ",
-          "timeout 110m",
-          " echo deploying LLM;",
-          " lmdeploy serve api_server meta-llama/Meta-Llama-3-8B-Instruct"],
-        "image": "docker.io/openmmlab/lmdeploy:latest",
-        "entrypoint": "/bin/sh",
+          "--model-id openai-community/gpt2 --port 8080"],
+        "image": "ghcr.io/huggingface/text-generation-inference:2.1.1",
         "gpu": true,
-        "expose": 23333,
+        "expose": 8080,
         "env": {
           "HUGGING_FACE_HUB_TOKEN": "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"
         }
@@ -25,9 +21,3 @@
     }
   ]
 }
-
-
-
-
-
-

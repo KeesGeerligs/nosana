@@ -148,6 +148,12 @@ class User:
                     "stream": False,
                     "num_predict": 512
                 }
+            elif self.framework == 'lmdeploy':
+                url = f"{self.base_url}/v1/chat/completions"
+                data = {
+                    "model": self.model,
+                    "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+                }
             else:
                 raise ValueError("Unsupported framework")
 
@@ -155,12 +161,8 @@ class User:
 
             # Print the first cURL request
             if not self.first_request_printed:
-                if self.framework == 'vllm':
-                    json_data = json.dumps(data).replace('"', '\\"')
-                    curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
-                else:
-                    json_data = json.dumps(data).replace('"', '\\"')
-                    curl_command = f'curl -X POST {url} -H "Content-Type: application/json" -d "{json_data}"'
+                json_data = json.dumps(data).replace('"', '\\"')
+                curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
                 print(f"First cURL Request: {curl_command}")
                 self.first_request_printed = True
 
@@ -174,8 +176,10 @@ class User:
                             response_json = await response.json()
                             if self.framework == 'vllm':
                                 response_text = response_json['choices'][0]['text']
-                            else:
+                            elif self.framework == 'ollama':
                                 response_text = await response.text()
+                            elif self.framework == 'lmdeploy':
+                                response_text = response_json['choices'][0]['message']['content']
                             #print(response_text)
                             tokens = len(response_text.split())
                             self.collector.collect_tokens(tokens)
@@ -228,7 +232,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_clients', type=int, help='Number of concurrent clients')
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds')
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
-    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama'], help='Framework to use (vllm or ollama)')
+    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy'], help='Framework to use (vllm, ollama, or lmdeploy)')
     parser.add_argument('--model', type=str, help='Model name to use')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
     args = parser.parse_args()

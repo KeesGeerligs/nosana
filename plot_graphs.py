@@ -1,69 +1,66 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import argparse
 
-def generate_gpu_comparison_plots(model_name, gpu1, gpu2):
+def generate_framework_cu_plots(model_name):
     directory = os.path.join('metrics', model_name)
     output_directory = os.path.join('plots', model_name)
     os.makedirs(output_directory, exist_ok=True)
 
-    data = {}
+    # Predefined CU levels
+    predefined_cus = ['1CU', '5CU', '10CU', '50CU', '100CU']
+    data = {cu: {} for cu in predefined_cus}
 
+    # Process each file
     if os.path.exists(directory):
         for filename in os.listdir(directory):
             if filename.endswith('.xlsx'):
                 parts = filename.split('_')
-                framework = parts[1]
-                cu = parts[2].replace('CU', '')
-                gpu = parts[3].split('.')[0]  # Remove file extension if present
+                framework = parts[2]
+                cu = parts[3]
+                gpu = parts[3].split('.')[0]
 
-                if gpu not in [gpu1, gpu2]:
+                # Validate and adjust CU if it doesn't match predefined ones
+                if cu not in data:
+                    print(f"Warning: '{cu}' is not a recognized CU level. Skipping file: {filename}")
                     continue
-                
+
                 filepath = os.path.join(directory, filename)
                 df = pd.read_excel(filepath)
-                
-                if cu not in data:
-                    data[cu] = {}
-                if gpu not in data[cu]:
-                    data[cu][gpu] = {}
-                if framework not in data[cu][gpu]:
-                    data[cu][gpu][framework] = []
 
-                data[cu][gpu][framework].append(df)
+                if framework not in data[cu]:
+                    data[cu][framework] = []
+                data[cu][framework].append(df)
 
-    if data:
-        for cu, gpu_data in data.items():
-            plt.figure(figsize=(12, 8))
-            for gpu, frameworks in gpu_data.items():
-                for framework, dfs in frameworks.items():
-                    for df in dfs:
-                        plt.plot(df['Time (seconds)'], df['Tokens per Second'], label=f'{framework} on {gpu}')
-            
-            plt.title(f'Tokens per Second for {cu} CU Comparison on {model_name}')
-            plt.xlabel('Time (seconds)')
-            plt.ylabel('Tokens per Second')
-            plt.legend(title="Framework and GPU")
-            plt.grid(True)
-            
-            output_filepath = os.path.join(output_directory, f'{cu}_CU_GPU_comparison.png')
-            plt.savefig(output_filepath)
-            plt.close()
-            print(f"Plot saved: {output_filepath}")
-    else:
+    # Generate plots for each CU
+    for cu, frameworks in data.items():
+        plt.figure(figsize=(12, 8))
+        for framework, dfs in frameworks.items():
+            for df in dfs:
+                plt.plot(df['Time (seconds)'], df['Tokens per Second'], label=f'{framework} ({cu})')
+
+        plt.title(f'Tokens per Second - {cu} on {model_name}')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Tokens per Second')
+        plt.legend(title="Framework")
+        plt.grid(True)
+
+        output_filepath = os.path.join(output_directory, f'{cu}_comparison.png')
+        plt.savefig(output_filepath)
+        plt.close()
+        print(f"Plot saved: {output_filepath}")
+
+    if not any(frameworks for frameworks in data.values()):
         print("No data to plot.")
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate GPU comparison plots for specified model and GPUs.')
-    parser.add_argument('model_name', type=str, help='Name of the model directory under "metrics".')
-    parser.add_argument('gpu1', type=str, help='Name of the first GPU to compare.')
-    parser.add_argument('gpu2', type=str, help='Name of the second GPU to compare.')
+    parser = argparse.ArgumentParser(description='Generate performance comparison plots for each CU level across frameworks.')
+    parser.add_argument('model_name', type=str, help='Directory name under "metrics" containing the data files.')
     
     args = parser.parse_args()
     
-    generate_gpu_comparison_plots(args.model_name, args.gpu1, args.gpu2)
+    generate_framework_cu_plots(args.model_name)
 
 if __name__ == '__main__':
     main()
