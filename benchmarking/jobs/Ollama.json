@@ -9,18 +9,21 @@
       "type": "container/run",
       "id": "Ollama",
       "args": {
-        "cmd": [
-          "-c ",
-          "ollama serve > /dev/null 2>&1 & sleep 1;",
-          "ollama pull x > /dev/null 2>&1;",
-          "serve_pid=$!; sleep 5400; kill $serve_pid"
-        ],
+      "cmd": [
+                "-c ",
+                "echo serving ollama;",
+                "ollama serve;",
+                "echo pulling llama3;",
+                "ollama pull llama3;",
+                "echo pulled llama3;",
+                "serve_pid=$!; sleep 3000; kill $serve_pid"],
         "entrypoint": "/bin/sh",
         "image": "docker.io/ollama/ollama",
         "gpu": true,
-        "expose": 11434,
+        "expose": 11400,
         "env": {
-          "OLLAMA_NUM_PARALLEL": "100"
+          "OLLAMA_NUM_PARALLEL": "5",
+          "OLLAMA_HOST": "http://0.0.0.0:11400"
         }
       }
     }

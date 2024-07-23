@@ -7,17 +7,18 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "LMDeploy",
+      "id": "VLLM",
       "args": {
         "cmd": [
           "-c ",
           "timeout 110m",
-          " echo deploying LLM;",
-          " lmdeploy serve api_server Qwen/Qwen2-1.5B-Instruct"],
-        "image": "docker.io/openmmlab/lmdeploy:latest",
+          " python3 -m vllm.entrypoints.openai.api_server",
+          " --model TheBloke/LLaMA-Pro-8B-AWQ",
+          " --quantization awq"], 
         "entrypoint": "/bin/sh",
+        "image": "vllm/vllm-openai:latest",
         "gpu": true,
-        "expose": 23333,
+        "expose": 8000,
         "env": {
           "HUGGING_FACE_HUB_TOKEN": "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"
         }
@@ -25,6 +26,5 @@
     }
   ]
 }
-
 
 
