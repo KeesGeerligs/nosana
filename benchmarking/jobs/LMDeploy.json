@@ -11,9 +11,9 @@
       "args": {
         "cmd": [
           "-c ",
-          "timeout 110m",
+          "timeout 80m",
           " echo deploying LLM;",
-          " lmdeploy serve api_server meta-llama/Meta-Llama-3-8B-Instruct"],
+          " lmdeploy serve api_server meta-llama/Meta-Llama-3.1-8B"],
         "image": "docker.io/openmmlab/lmdeploy:latest",
         "entrypoint": "/bin/sh",
         "gpu": true,

@@ -1,0 +1,23 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "ollama",
+      "args": {
+        "cmd": ["bash", "/run_llm.sh", " Tell me a fun fact about the roman empire"],
+        "image": "docker.io/ben1t0/llama3.1:example",
+        "gpu": true
+      }
+
+    }
+  ]
+}
+
+
+
+
