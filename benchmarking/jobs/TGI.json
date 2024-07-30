@@ -10,7 +10,7 @@
       "id": "TextGenerationInference",
       "args": {
         "cmd": [
-          "--model-id openai-community/gpt2 --port 8080"],
+          "--model-id meta-llama/Meta-Llama-3-8B --port 8080"],
         "image": "ghcr.io/huggingface/text-generation-inference:2.1.1",
         "gpu": true,
         "expose": 8080,

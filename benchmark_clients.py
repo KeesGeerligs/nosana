@@ -108,7 +108,7 @@ class MetricsCollector:
         plt.title('Tokens per Second over Time')
         plt.legend()
         plt.grid(True)
-        plt.show()  # Only show the plot without saving
+        plt.show()  
         self.save_to_excel()
 
 class User:
@@ -135,9 +135,6 @@ class User:
                     "model": self.model,
                     "prompt": prompt['instruction'] + " " + prompt['context'],
                     "max_tokens": 512,
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "n": 1,
                     "stop": ["\\n"]
                 }
             elif self.framework == 'ollama':
@@ -153,6 +150,12 @@ class User:
                 data = {
                     "model": self.model,
                     "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+                }
+            elif self.framework == 'TGI': 
+                url = f"{self.base_url}/generate"
+                data = {
+                    "inputs": prompt['instruction'] + " " + prompt['context'],
+                    "parameters": {"max_new_tokens": 512}
                 }
             else:
                 raise ValueError("Unsupported framework")
@@ -174,12 +177,12 @@ class User:
                         self.collector.collect_response_status(response.status)
                         if response.status == 200:
                             response_json = await response.json()
-                            if self.framework == 'vllm':
+                            if self.framework in ['vllm', 'lmdeploy']:
                                 response_text = response_json['choices'][0]['text']
                             elif self.framework == 'ollama':
                                 response_text = await response.text()
-                            elif self.framework == 'lmdeploy':
-                                response_text = response_json['choices'][0]['message']['content']
+                            elif self.framework == 'TGI':
+                                response_text = response_json.get('generated_text', '')  
                             #print(response_text)
                             tokens = len(response_text.split())
                             self.collector.collect_tokens(tokens)
@@ -189,11 +192,12 @@ class User:
                                 self.empty_response_count += 1
                                 print(f"User {self.user_id} Request {self.request_count}: 0 tokens. Response: {response_text}")
                         else:
+                            print(response)
                             print(f"User {self.user_id} Request {self.request_count} received non-200 response: {response.status}")
             except Exception as e:
                 print(f"User {self.user_id} Request {self.request_count} failed: {e}")
             
-            await asyncio.sleep(0.01)  # Simulate variable request timing
+            await asyncio.sleep(5)#0.01)  # Simulate variable request timing
 
     def report_individual_tokens(self):
         duration = time.time() - self.start_time
@@ -232,7 +236,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_clients', type=int, help='Number of concurrent clients')
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds')
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
-    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy'], help='Framework to use (vllm, ollama, or lmdeploy)')
+    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy', 'TGI'], help='Framework to use (vllm, ollama, lmdeploy, or TGI)')
     parser.add_argument('--model', type=str, help='Model name to use')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
     args = parser.parse_args()
