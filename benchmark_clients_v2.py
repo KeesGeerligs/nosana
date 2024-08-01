@@ -26,6 +26,7 @@ class MetricsCollector:
         self.total_tokens = 0
         self.time_series = []
         self.tokens_per_second_series = []
+        self.latency_series = []
         self.run_name = "metrics_report"
         self.session_time = session_time
         self.ping_latency = ping_latency
@@ -42,6 +43,7 @@ class MetricsCollector:
             elapsed = time.time() - start_time - self.ping_latency
             self.response_bucket[int(time.time())] += 1
             self.response_latency_bucket[int(time.time())].append(elapsed)
+            self.latency_series.append(elapsed)
 
     @contextlib.contextmanager
     def collect_user(self):
@@ -95,17 +97,22 @@ class MetricsCollector:
         print(f"Total Tokens per Second: {self.total_tokens / total_duration}")
         print(f"Total Requests Made: {self.total_requests}")
 
-    def save_to_excel(self):
+    def save_to_excel(self, sheet_name='Metrics'):
         os.makedirs("metrics", exist_ok=True)
         filename = f"metrics/{self.run_name}.xlsx"
+
+        min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
         data = {
-            'Time (seconds)': self.time_series,
-            'Tokens per Second': self.tokens_per_second_series
+            'Time (seconds)': self.time_series[:min_length],
+            'Tokens per Second': self.tokens_per_second_series[:min_length],
+            'Latency (seconds)': self.latency_series[:min_length]
         }
+        
         df = pd.DataFrame(data)
-        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Tokens_Per_Second')
+        with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
+            df.to_excel(writer, index=False, sheet_name=sheet_name)
         print(f"Metrics saved to {filename}")
+
 
     def plot(self):
         plt.figure(figsize=(10, 5))
@@ -116,7 +123,15 @@ class MetricsCollector:
         plt.legend()
         plt.grid(True)
         plt.show()
-        self.save_to_excel()
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.time_series, self.latency_series, label='Latency (s)')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Latency (seconds)')
+        plt.title('Response Latency over Time')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 class User:
     def __init__(self, session, base_url, framework, model, collector, prompts, user_id):
@@ -173,7 +188,7 @@ class User:
             if not self.first_request_printed:
                 json_data = json.dumps(data).replace('"', '\\"')
                 curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
-                print(f"First cURL Request: {curl_command}")
+                #print(f"First cURL Request: {curl_command}")
                 self.first_request_printed = True
 
             try:
@@ -216,11 +231,14 @@ def load_prompts(file_path):
         return [json.loads(line) for line in f if line.strip()]
 
 class UserSpawner:
-    def __init__(self, user_def, collector: MetricsCollector, target_user_count=None, target_time=None):
+    def __init__(self, base_url, framework, model, collector: MetricsCollector, prompts, target_user_count=None, target_time=None):
         self.target_user_count = 1 if target_user_count is None else target_user_count
         self.target_time = time.time() + 10 if target_time is None else target_time
         self.data_collector = collector
-        self.user_def = user_def
+        self.base_url = base_url
+        self.framework = framework
+        self.model = model
+        self.prompts = prompts
         self.user_list = []
 
     async def sync(self):
@@ -233,37 +251,31 @@ class UserSpawner:
     def current_user_count(self):
         return len(self.user_list)
 
-    async def user_loop(self):
+    async def user_loop(self, session, user_id):
+        user = User(session, self.base_url, self.framework, self.model, self.data_collector, self.prompts, user_id)
         with self.data_collector.collect_user():
-            cookie_jar = aiohttp.DummyCookieJar()
             try:
-                async with aiohttp.ClientSession(cookie_jar=cookie_jar) as session:
-                    while True:
-                        await self.user_def.make_request()
-                        await asyncio.sleep(self.user_def.get_rest_time())
+                while True:
+                    await user.make_request()
             except asyncio.CancelledError:
                 pass
 
-
-
-    def spawn_user(self):
-        self.user_list.append(asyncio.create_task(self.user_loop()))
+    def spawn_user(self, session, user_id):
+        self.user_list.append(asyncio.create_task(self.user_loop(session, user_id)))
 
     async def cancel_all_users(self):
-        try:
+        while self.user_list:
             user = self.user_list.pop()
             user.cancel()
-        except IndexError:
-            pass
         await asyncio.sleep(0)
 
-    async def spawner_loop(self):
+    async def spawner_loop(self, session):
         while True:
             current_users = len(self.user_list)
             if current_users == self.target_user_count:
                 await asyncio.sleep(0.1)
             elif current_users < self.target_user_count:
-                self.spawn_user()
+                self.spawn_user(session, current_users)
                 sleep_time = max(
                     (self.target_time - time.time())
                     / (self.target_user_count - current_users),
@@ -271,7 +283,8 @@ class UserSpawner:
                 )
                 await asyncio.sleep(sleep_time)
             elif current_users > self.target_user_count:
-                self.user_list.pop().cancel()
+                user = self.user_list.pop()
+                user.cancel()
                 sleep_time = max(
                     (time.time() - self.target_time)
                     / (current_users - self.target_user_count),
@@ -279,10 +292,7 @@ class UserSpawner:
                 )
                 await asyncio.sleep(sleep_time)
 
-
-
-
-    async def aimd_loop(self, adjust_interval=5, sampling_interval=5, ss_delta=1):
+    async def aimd_loop(self, session, adjust_interval=5, sampling_interval=5, ss_delta=1):
         def linear_regression(x, y):
             x = tuple((i, 1) for i in x)
             y = tuple(i for i in y)
@@ -318,63 +328,49 @@ class UserSpawner:
             await asyncio.sleep(min(adjust_interval, sampling_interval, 10))
             return 0
 
-async def start_benchmark_session(args, user_def):
-    response_times = []
-    async with aiohttp.ClientSession() as session:
-        async with session.get(user_def.ping_url()) as response:
-            assert response.status == 200
-        await asyncio.sleep(0.3)
+async def wait_for_service(url, check_interval=10):
+    start_time = time.time()
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        break
+        except:
+            pass
+        await asyncio.sleep(check_interval)
+    return time.time() - start_time
 
-        for _ in range(5):
-            time_start = time.time()
-            async with session.get(user_def.ping_url()) as response:
-                assert response.status == 200
-            response_times.append(time.time() - time_start)
-            await asyncio.sleep(0.3)
-    ping_latency = sum(response_times) / len(response_times)
-    print(f"Ping latency: {ping_latency}")
-
-    collector = MetricsCollector(user_def, args.session_time, ping_latency - 0.005 if args.ping_correction else 0)
-    user_spawner = UserSpawner(user_def, collector, args.max_users, target_time=time.time() + 20)
-    asyncio.create_task(user_spawner.spawner_loop())
-    asyncio.create_task(collector.report_loop())
-    if args.max_users is None:
-        asyncio.create_task(user_spawner.aimd_loop())
-
-    if args.session_time is not None:
-        await asyncio.sleep(args.session_time + 1)
-    else:
-        await asyncio.wait(user_spawner.user_list)
-
-    await user_spawner.cancel_all_users()
-    return 0
-
-async def main(num_clients, job_length, url, framework, model, run_name, ping_correction):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction):
     prompts = load_prompts('databricks-dolly-15k.jsonl')
-    response_times = []
-    async with aiohttp.ClientSession() as session:
-        for _ in range(5):
-            time_start = time.time()
-            async with session.get(url) as response:
-                assert response.status == 200
-            response_times.append(time.time() - time_start)
-            await asyncio.sleep(0.3)
-    ping_latency = sum(response_times) / len(response_times)
-    print(f"Ping latency: {ping_latency}")
+    wait_time = await wait_for_service(url)
+    print(f"Service became available after {wait_time} seconds.")
 
-    collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
-    collector.run_name = run_name
-    user_spawner = UserSpawner(User(session, url, framework, model, collector, prompts, user_id=0), collector, target_user_count=num_clients, target_time=time.time() + 20)
-    asyncio.create_task(user_spawner.spawner_loop())
-    asyncio.create_task(collector.report_loop())
-    await asyncio.sleep(job_length + 1)
-    await user_spawner.cancel_all_users()
-    collector.final_report()
-    collector.plot()
+    for num_clients in num_clients_list:
+        response_times = []
+        async with aiohttp.ClientSession() as session:
+            for _ in range(5):
+                time_start = time.time()
+                async with session.get(url) as response:
+                    assert response.status == 200
+                response_times.append(time.time() - time_start)
+                await asyncio.sleep(0.3)
+            ping_latency = sum(response_times) / len(response_times)
+            print(f"Ping latency: {ping_latency}")
+
+            collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
+            collector.run_name = run_name
+            user_spawner = UserSpawner(url, framework, model, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20)
+            asyncio.create_task(user_spawner.spawner_loop(session))
+            asyncio.create_task(collector.report_loop())
+            await asyncio.sleep(job_length + 1)
+            await user_spawner.cancel_all_users()
+            collector.final_report()
+            collector.save_to_excel(sheet_name=f'CU_{num_clients}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run benchmark on an API')
-    parser.add_argument('--num_clients', type=int, help='Number of concurrent clients')
+    parser.add_argument('--num_clients_list', type=int, nargs='+', help='List of concurrent clients to test with')
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds')
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
     parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy', 'TGI'], help='Framework to use (vllm, ollama, lmdeploy, or TGI)')
@@ -383,5 +379,5 @@ if __name__ == "__main__":
     parser.add_argument('--ping_correction', type=bool, default=True, help='Apply ping latency correction')
     args = parser.parse_args()
 
-    print(f"Running benchmark with {args.num_clients} clients for {args.job_length} seconds on {args.url} using {args.framework} framework with model {args.model}...")
-    asyncio.run(main(args.num_clients, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction))
+    print(f"Running benchmark series with clients {args.num_clients_list} for {args.job_length} seconds each on {args.url} using {args.framework} framework with model {args.model}...")
+    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction))
