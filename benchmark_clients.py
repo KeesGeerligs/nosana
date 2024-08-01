@@ -74,8 +74,8 @@ class MetricsCollector:
                 latency_values = [v for values in self.response_latency_bucket.values() for v in values]
                 if latency_values:
                     print(f"Average Response Latency: {np.mean(latency_values)} seconds")
-                    print(f"Median Response Latency: {np.percentile(latency_values, 50)} seconds")
-                    print(f"95% Response Latency: {np.percentile(latency_values, 95)} seconds")
+                    #print(f"Median Response Latency: {np.percentile(latency_values, 50)} seconds")
+                    #print(f"95% Response Latency: {np.percentile(latency_values, 95)} seconds")
             print(f"Response Tokens/s: {tokens_per_second}")
             print(f"Total Tokens Produced: {self.total_tokens}")
             print()
@@ -177,8 +177,10 @@ class User:
                         self.collector.collect_response_status(response.status)
                         if response.status == 200:
                             response_json = await response.json()
-                            if self.framework in ['vllm', 'lmdeploy']:
+                            if self.framework in ['vllm']:
                                 response_text = response_json['choices'][0]['text']
+                            elif self.framework == 'lmdeploy':
+                                response_text = response_json['choices'][0]['message']['content']
                             elif self.framework == 'ollama':
                                 response_text = await response.text()
                             elif self.framework == 'TGI':
@@ -197,7 +199,7 @@ class User:
             except Exception as e:
                 print(f"User {self.user_id} Request {self.request_count} failed: {e}")
             
-            await asyncio.sleep(5)#0.01)  # Simulate variable request timing
+            await asyncio.sleep(0.01)  # Simulate variable request timing
 
     def report_individual_tokens(self):
         duration = time.time() - self.start_time

@@ -1,0 +1,7 @@
+FROM docker.io/openmmlab/lmdeploy:latest
+
+
+RUN lmdeploy serve api_server meta-llama/Meta-Llama-3-8B-Instruct
+
+
+ENTRYPOINT ["/bin/bash"] 
