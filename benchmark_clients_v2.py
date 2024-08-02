@@ -64,30 +64,34 @@ class MetricsCollector:
         self.response_word_bucket[int(time.time())] += count
 
     async def report_loop(self, time_window=10):
-        while True:
-            await asyncio.sleep(time_window)
-            current_time = time.time()
-            report_time = int(current_time - self.start_time)
-            tokens_per_second = sum(self.response_word_bucket.values()) / (current_time - self.start_time)
-            self.time_series.append(report_time)
-            self.tokens_per_second_series.append(tokens_per_second)
-            print(f"Time: {report_time} seconds")
-            print(f"Active Users: {self.on_going_users}")
-            print(f"Total Requests: {self.total_requests}")
-            print(f"Active Requests: {self.on_going_requests}")
-            if self.response_latency_bucket:
-                latency_values = [v for values in self.response_latency_bucket.values() for v in values]
-                if latency_values:
-                    print(f"Average Response Latency: {np.mean(latency_values)} seconds")
-                    print(f"95th Percentile Latency: {np.percentile(latency_values, 95)} seconds")
-                    print(f"99th Percentile Latency: {np.percentile(latency_values, 99)} seconds")
-            print(f"Response Tokens/s: {tokens_per_second}")
-            print(f"Total Tokens Produced: {self.total_tokens}")
-            print()
+        try:
+            while True:
+                await asyncio.sleep(time_window)
+                current_time = time.time()
+                report_time = int(current_time - self.start_time)
+                tokens_per_second = sum(self.response_word_bucket.values()) / (current_time - self.start_time)
+                self.time_series.append(report_time)
+                self.tokens_per_second_series.append(tokens_per_second)
+                print(f"Time: {report_time} seconds")
+                print(f"Active Users: {self.on_going_users}")
+                print(f"Total Requests: {self.total_requests}")
+                print(f"Active Requests: {self.on_going_requests}")
+                if self.response_latency_bucket:
+                    latency_values = [v for values in self.response_latency_bucket.values() for v in values]
+                    if latency_values:
+                        print(f"Average Response Latency: {np.mean(latency_values)} seconds")
+                        print(f"95th Percentile Latency: {np.percentile(latency_values, 95)} seconds")
+                        print(f"99th Percentile Latency: {np.percentile(latency_values, 99)} seconds")
+                print(f"Response Tokens/s: {tokens_per_second}")
+                print(f"Total Tokens Produced: {self.total_tokens}")
+                print()
 
-            if self.session_time and report_time >= self.session_time:
-                self.final_report()
-                break
+                if self.session_time and report_time >= self.session_time:
+                    self.final_report()
+                    break
+        except asyncio.CancelledError:
+            self.final_report()
+            print("Report loop cancelled")
 
     def final_report(self):
         total_duration = time.time() - self.start_time
@@ -107,12 +111,13 @@ class MetricsCollector:
             'Tokens per Second': self.tokens_per_second_series[:min_length],
             'Latency (seconds)': self.latency_series[:min_length]
         }
-        
+
         df = pd.DataFrame(data)
         with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
+            if sheet_name in writer.book.sheetnames:
+                del writer.book[sheet_name]
             df.to_excel(writer, index=False, sheet_name=sheet_name)
         print(f"Metrics saved to {filename}")
-
 
     def plot(self):
         plt.figure(figsize=(10, 5))
@@ -134,7 +139,7 @@ class MetricsCollector:
         plt.show()
 
 class User:
-    def __init__(self, session, base_url, framework, model, collector, prompts, user_id):
+    def __init__(self, session, base_url, framework, model, collector, prompts, user_id, token=None):
         self.session = session
         self.base_url = base_url
         self.framework = framework
@@ -147,6 +152,7 @@ class User:
         self.first_request_printed = False
         self.request_count = 0
         self.empty_response_count = 0
+        self.token = token
 
     async def make_request(self):
         while True:
@@ -179,6 +185,16 @@ class User:
                     "inputs": prompt['instruction'] + " " + prompt['context'],
                     "parameters": {"max_new_tokens": 512}
                 }
+            elif self.framework == 'deepinfra':
+                url = f"{self.base_url}/v1/openai/chat/completions"
+                data = {
+                    "model": self.model,
+                    "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+                }
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {self.token}"
+                }
             else:
                 raise ValueError("Unsupported framework")
 
@@ -188,6 +204,8 @@ class User:
             if not self.first_request_printed:
                 json_data = json.dumps(data).replace('"', '\\"')
                 curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
+                if self.framework == 'deepinfra':
+                    curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -H "Authorization: Bearer {self.token}" -d "{json_data}"'
                 #print(f"First cURL Request: {curl_command}")
                 self.first_request_printed = True
 
@@ -207,6 +225,8 @@ class User:
                                 response_text = await response.text()
                             elif self.framework == 'TGI':
                                 response_text = response_json.get('generated_text', '')
+                            elif self.framework == 'deepinfra':
+                                response_text = response_json['choices'][0]['message']['content']
                             tokens = len(response_text.split())
                             self.collector.collect_tokens(tokens)
                             self.tokens += tokens
@@ -231,7 +251,7 @@ def load_prompts(file_path):
         return [json.loads(line) for line in f if line.strip()]
 
 class UserSpawner:
-    def __init__(self, base_url, framework, model, collector: MetricsCollector, prompts, target_user_count=None, target_time=None):
+    def __init__(self, base_url, framework, model, collector: MetricsCollector, prompts, target_user_count=None, target_time=None, token=None):
         self.target_user_count = 1 if target_user_count is None else target_user_count
         self.target_time = time.time() + 10 if target_time is None else target_time
         self.data_collector = collector
@@ -240,6 +260,7 @@ class UserSpawner:
         self.model = model
         self.prompts = prompts
         self.user_list = []
+        self.token = token
 
     async def sync(self):
         while True:
@@ -252,7 +273,7 @@ class UserSpawner:
         return len(self.user_list)
 
     async def user_loop(self, session, user_id):
-        user = User(session, self.base_url, self.framework, self.model, self.data_collector, self.prompts, user_id)
+        user = User(session, self.base_url, self.framework, self.model, self.data_collector, self.prompts, user_id, self.token)
         with self.data_collector.collect_user():
             try:
                 while True:
@@ -270,27 +291,31 @@ class UserSpawner:
         await asyncio.sleep(0)
 
     async def spawner_loop(self, session):
-        while True:
-            current_users = len(self.user_list)
-            if current_users == self.target_user_count:
-                await asyncio.sleep(0.1)
-            elif current_users < self.target_user_count:
-                self.spawn_user(session, current_users)
-                sleep_time = max(
-                    (self.target_time - time.time())
-                    / (self.target_user_count - current_users),
-                    0,
-                )
-                await asyncio.sleep(sleep_time)
-            elif current_users > self.target_user_count:
-                user = self.user_list.pop()
-                user.cancel()
-                sleep_time = max(
-                    (time.time() - self.target_time)
-                    / (current_users - self.target_user_count),
-                    0,
-                )
-                await asyncio.sleep(sleep_time)
+        try:
+            while True:
+                current_users = len(self.user_list)
+                if current_users == self.target_user_count:
+                    await asyncio.sleep(0.1)
+                elif current_users < self.target_user_count:
+                    self.spawn_user(session, current_users)
+                    sleep_time = max(
+                        (self.target_time - time.time())
+                        / (self.target_user_count - current_users),
+                        0,
+                    )
+                    await asyncio.sleep(sleep_time)
+                elif current_users > self.target_user_count:
+                    user = self.user_list.pop()
+                    user.cancel()
+                    sleep_time = max(
+                        (time.time() - self.target_time)
+                        / (current_users - self.target_user_count),
+                        0,
+                    )
+                    await asyncio.sleep(sleep_time)
+        except asyncio.CancelledError:
+            for task in self.user_list:
+                task.cancel()
 
     async def aimd_loop(self, session, adjust_interval=5, sampling_interval=5, ss_delta=1):
         def linear_regression(x, y):
@@ -341,7 +366,7 @@ async def wait_for_service(url, check_interval=10):
         await asyncio.sleep(check_interval)
     return time.time() - start_time
 
-async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, token=None):
     prompts = load_prompts('databricks-dolly-15k.jsonl')
     wait_time = await wait_for_service(url)
     print(f"Service became available after {wait_time} seconds.")
@@ -360,11 +385,13 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
 
             collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
             collector.run_name = run_name
-            user_spawner = UserSpawner(url, framework, model, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20)
-            asyncio.create_task(user_spawner.spawner_loop(session))
-            asyncio.create_task(collector.report_loop())
+            user_spawner = UserSpawner(url, framework, model, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20, token=token)
+            spawner_task = asyncio.create_task(user_spawner.spawner_loop(session))
+            report_task = asyncio.create_task(collector.report_loop(time_window=5))  # Adjust the time window here
             await asyncio.sleep(job_length + 1)
             await user_spawner.cancel_all_users()
+            spawner_task.cancel()
+            report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
 
@@ -373,11 +400,12 @@ if __name__ == "__main__":
     parser.add_argument('--num_clients_list', type=int, nargs='+', help='List of concurrent clients to test with')
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds')
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
-    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy', 'TGI'], help='Framework to use (vllm, ollama, lmdeploy, or TGI)')
+    parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy', 'TGI', 'deepinfra'], help='Framework to use (vllm, ollama, lmdeploy, TGI, or deepinfra)')
     parser.add_argument('--model', type=str, help='Model name to use')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
     parser.add_argument('--ping_correction', type=bool, default=True, help='Apply ping latency correction')
+    parser.add_argument('--token', type=str, help='Authorization token for Deepinfra')
     args = parser.parse_args()
 
     print(f"Running benchmark series with clients {args.num_clients_list} for {args.job_length} seconds each on {args.url} using {args.framework} framework with model {args.model}...")
-    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction))
+    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.token))
