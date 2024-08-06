@@ -13,7 +13,7 @@
           "-c ",
           "timeout 80m",
           " python3 -m vllm.entrypoints.openai.api_server",
-          " --model meta-llama/Meta-Llama-3.1-8B"], 
+          " --model meta-llama/Meta-Llama-3-8B-Instruct"], 
         "entrypoint": "/bin/sh",
         "image": "vllm/vllm-openai:latest",
         "gpu": true,
