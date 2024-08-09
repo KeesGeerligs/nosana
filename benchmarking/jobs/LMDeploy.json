@@ -13,7 +13,7 @@
           "-c ",
           "timeout 80m",
           " echo deploying LLM;",
-          " lmdeploy serve api_server casperhansen/llama-3-8b-instruct-awq"],
+          " lmdeploy serve api_server meta-llama/Meta-Llama-3.1-8B-Instruct"],
         "image": "docker.io/openmmlab/lmdeploy:latest",
         "entrypoint": "/bin/sh",
         "gpu": true,
