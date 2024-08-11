@@ -12,9 +12,7 @@
         "cmd": [
           "-c ",
           "timeout 10m",
-          " python3 -m vllm.entrypoints.openai.api_server",
-          " --model microsoft/Phi-3-mini-4k-instruct",
-          " --max-model-len 512"], 
+          " python3 -m vllm.entrypoints.openai.api_server --model microsoft/Phi-3-mini-4k-instruct --max-model-len 512"], 
         "entrypoint": "/bin/sh",
         "image": "vllm/vllm-openai:latest",
         "gpu": true,
