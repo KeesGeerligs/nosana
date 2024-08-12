@@ -10,10 +10,17 @@
       "id": "VLLM",
       "args": {
         "cmd": [
-          "-c ",
-          "timeout 10m",
-          " python3 -m vllm.entrypoints.openai.api_server --model microsoft/Phi-3-mini-4k-instruct --max-model-len 512"], 
-        "entrypoint": "/bin/sh",
+          "timeout",
+          "10m",
+          "python3",
+          "-m",
+          "vllm.entrypoints.openai.api_server",
+          "--model",
+          "microsoft/Phi-3-mini-4k-instruct",
+          "--max-model-len",
+          "512"
+        ],
+        "entrypoint": "timeout",
         "image": "vllm/vllm-openai:latest",
         "gpu": true,
         "expose": 8000,

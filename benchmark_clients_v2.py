@@ -138,6 +138,11 @@ class MetricsCollector:
         plt.grid(True)
         plt.show()
 
+
+def load_prompts(file_path):
+    with open(file_path, 'r') as f:
+        return [json.loads(line) for line in f if line.strip()]
+
 class User:
     def __init__(self, session, base_url, framework, model, collector, prompts, user_id, token=None):
         self.session = session
@@ -155,100 +160,95 @@ class User:
         self.token = token
 
     async def make_request(self):
+        prompt = random.choice(self.prompts)
+        if self.framework == 'vllm':
+            url = f"{self.base_url}/v1/completions"
+            data = {
+                "model": self.model,
+                "prompt": prompt['instruction'] + " " + prompt['context'],
+                "max_tokens": 512,
+                "stop": ["\\n"]
+            }
+        elif self.framework == 'ollama':
+            url = f"{self.base_url}/api/generate"
+            data = {
+                "model": self.model,
+                "prompt": prompt['instruction'] + " " + prompt['context'],
+                "stream": False,
+                "num_predict": 512
+            }
+        elif self.framework == 'lmdeploy':
+            url = f"{self.base_url}/v1/chat/completions"
+            data = {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+            }
+        elif self.framework == 'TGI':
+            url = f"{self.base_url}/generate"
+            data = {
+                "inputs": prompt['instruction'] + " " + prompt['context'],
+                "parameters": {"max_new_tokens": 512}
+            }
+        elif self.framework == 'deepinfra':
+            url = f"{self.base_url}/v1/openai/chat/completions"
+            data = {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.token}"
+            }
+        else:
+            raise ValueError("Unsupported framework")
+
+        # Default headers
+        headers = {"Content-Type": "application/json"}
+
+        # Print the first cURL request
+        if not self.first_request_printed:
+            json_data = json.dumps(data).replace('"', '\\"')
+            curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
+            if self.framework == 'deepinfra':
+                curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -H "Authorization: Bearer {self.token}" -d "{json_data}"'
+            #print(f"First cURL Request: {curl_command}")
+            self.first_request_printed = True
+
+        try:
+            with self.collector.collect_http_request(), self.collector.collect_user():
+                start_time = time.time()
+                async with self.session.post(url, headers=headers, json=data) as response:
+                    self.request_count += 1
+                    self.collector.collect_response_status(response.status)
+                    if response.status == 200:
+                        response_json = await response.json()
+                        if self.framework in ['vllm']:
+                            response_text = response_json['choices'][0]['text']
+                        elif self.framework == 'lmdeploy':
+                            response_text = response_json['choices'][0]['message']['content']
+                        elif self.framework == 'ollama':
+                            response_text = await response.text()
+                        elif self.framework == 'TGI':
+                            response_text = response_json.get('generated_text', '')
+                        elif self.framework == 'deepinfra':
+                            response_text = response_json['choices'][0]['message']['content']
+                        tokens = len(response_text.split())
+                        self.collector.collect_tokens(tokens)
+                        self.tokens += tokens
+                        self.collector.collect_response_head_latency(time.time() - start_time)
+                        if tokens == 0:
+                            self.empty_response_count += 1
+                            print(f"User {self.user_id} Request {self.request_count}: 0 tokens. Response: {response_text}")
+                    else:
+                        print(f"User {self.user_id} Request {self.request_count} received non-200 response: {response.status}")
+        except Exception as e:
+            print(f"User {self.user_id} Request {self.request_count} failed: {e}")
+
+    async def user_loop(self):
         while True:
-            prompt = random.choice(self.prompts)
-            if self.framework == 'vllm':
-                url = f"{self.base_url}/v1/completions"
-                data = {
-                    "model": self.model,
-                    "prompt": prompt['instruction'] + " " + prompt['context'],
-                    "max_tokens": 512,
-                    "stop": ["\\n"]
-                }
-            elif self.framework == 'ollama':
-                url = f"{self.base_url}/api/generate"
-                data = {
-                    "model": self.model,
-                    "prompt": prompt['instruction'] + " " + prompt['context'],
-                    "stream": False,
-                    "num_predict": 512
-                }
-            elif self.framework == 'lmdeploy':
-                url = f"{self.base_url}/v1/chat/completions"
-                data = {
-                    "model": self.model,
-                    "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
-                }
-            elif self.framework == 'TGI':
-                url = f"{self.base_url}/generate"
-                data = {
-                    "inputs": prompt['instruction'] + " " + prompt['context'],
-                    "parameters": {"max_new_tokens": 512}
-                }
-            elif self.framework == 'deepinfra':
-                url = f"{self.base_url}/v1/openai/chat/completions"
-                data = {
-                    "model": self.model,
-                    "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
-                }
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self.token}"
-                }
-            else:
-                raise ValueError("Unsupported framework")
-
-            headers = {"Content-Type": "application/json"}
-
-            # Print the first cURL request
-            if not self.first_request_printed:
-                json_data = json.dumps(data).replace('"', '\\"')
-                curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -d "{json_data}"'
-                if self.framework == 'deepinfra':
-                    curl_command = f'curl -X POST "{url}" -H "Content-Type: application/json" -H "Authorization: Bearer {self.token}" -d "{json_data}"'
-                #print(f"First cURL Request: {curl_command}")
-                self.first_request_printed = True
-
-            try:
-                with self.collector.collect_http_request(), self.collector.collect_user():
-                    start_time = time.time()
-                    async with self.session.post(url, headers=headers, json=data) as response:
-                        self.request_count += 1
-                        self.collector.collect_response_status(response.status)
-                        if response.status == 200:
-                            response_json = await response.json()
-                            if self.framework in ['vllm']:
-                                response_text = response_json['choices'][0]['text']
-                            elif self.framework == 'lmdeploy':
-                                response_text = response_json['choices'][0]['message']['content']
-                            elif self.framework == 'ollama':
-                                response_text = await response.text()
-                            elif self.framework == 'TGI':
-                                response_text = response_json.get('generated_text', '')
-                            elif self.framework == 'deepinfra':
-                                response_text = response_json['choices'][0]['message']['content']
-                            tokens = len(response_text.split())
-                            self.collector.collect_tokens(tokens)
-                            self.tokens += tokens
-                            self.collector.collect_response_head_latency(time.time() - start_time)
-                            if tokens == 0:
-                                self.empty_response_count += 1
-                                print(f"User {self.user_id} Request {self.request_count}: 0 tokens. Response: {response_text}")
-                        else:
-                            print(f"User {self.user_id} Request {self.request_count} received non-200 response: {response.status}")
-            except Exception as e:
-                print(f"User {self.user_id} Request {self.request_count} failed: {e}")
-            
+            await self.make_request()
             await asyncio.sleep(0.01)  # Simulate variable request timing
 
-    def report_individual_tokens(self):
-        duration = time.time() - self.start_time
-        tokens_per_second = self.tokens / duration if duration > 0 else 0
-        print(f"User {self.user_id} Tokens/s: {tokens_per_second}, Total Tokens: {self.tokens}, Total Requests: {self.request_count}, Empty Responses: {self.empty_response_count}")
-
-def load_prompts(file_path):
-    with open(file_path, 'r') as f:
-        return [json.loads(line) for line in f if line.strip()]
 
 class UserSpawner:
     def __init__(self, base_url, framework, model, collector: MetricsCollector, prompts, target_user_count=None, target_time=None, token=None):
@@ -262,27 +262,18 @@ class UserSpawner:
         self.user_list = []
         self.token = token
 
-    async def sync(self):
-        while True:
-            if self.current_user_count == self.target_user_count:
-                return
-            await asyncio.sleep(0.1)
-
     @property
     def current_user_count(self):
         return len(self.user_list)
 
     async def user_loop(self, session, user_id):
         user = User(session, self.base_url, self.framework, self.model, self.data_collector, self.prompts, user_id, self.token)
-        with self.data_collector.collect_user():
-            try:
-                while True:
-                    await user.make_request()
-            except asyncio.CancelledError:
-                pass
+        await user.user_loop()
 
     def spawn_user(self, session, user_id):
-        self.user_list.append(asyncio.create_task(self.user_loop(session, user_id)))
+        #print(f"Spawning user {user_id}")
+        task = asyncio.create_task(self.user_loop(session, user_id))
+        self.user_list.append(task)
 
     async def cancel_all_users(self):
         while self.user_list:
@@ -316,6 +307,7 @@ class UserSpawner:
         except asyncio.CancelledError:
             for task in self.user_list:
                 task.cancel()
+
 
     async def aimd_loop(self, session, adjust_interval=5, sampling_interval=5, ss_delta=1):
         def linear_regression(x, y):
@@ -353,34 +345,104 @@ class UserSpawner:
             await asyncio.sleep(min(adjust_interval, sampling_interval, 10))
             return 0
 
-async def wait_for_service(url, check_interval=10):
+def get_ping_url(base_url, framework):
+    if framework == 'vllm':
+        return f"{base_url}/v1/completions"
+    elif framework == 'ollama':
+        return f"{base_url}/api/generate"
+    elif framework == 'lmdeploy':
+        return f"{base_url}/v1/chat/completions"
+    elif framework == 'TGI':
+        return f"{base_url}/generate"
+    elif framework == 'deepinfra':
+        return f"{base_url}/v1/openai/chat/completions"
+    else:
+        raise ValueError("Unsupported framework")
+
+def get_ping_data(framework, model):
+    if framework == 'vllm':
+        return {
+            "model": model,
+            "prompt": "ping",
+            "max_tokens": 1
+        }
+    elif framework == 'ollama':
+        return {
+            "model": model,
+            "prompt": "ping",
+            "stream": False,
+            "num_predict": 1
+        }
+    elif framework == 'lmdeploy':
+        return {
+            "model": model,
+            "messages": [{"role": "user", "content": "ping"}]
+        }
+    elif framework == 'TGI':
+        return {
+            "inputs": "ping",
+            "parameters": {"max_new_tokens": 1}
+        }
+    elif framework == 'deepinfra':
+        return {
+            "model": model,
+            "messages": [{"role": "user", "content": "ping"}]
+        }
+    else:
+        raise ValueError("Unsupported framework")
+
+async def wait_for_service(base_url, framework, model, token=None, check_interval=10):
+    ping_url = get_ping_url(base_url, framework)
+    ping_data = get_ping_data(framework, model)
+
+    headers = {"Content-Type": "application/json"}
+    if framework == 'deepinfra':
+        headers["Authorization"] = f"Bearer {token}"
+
     start_time = time.time()
     while True:
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
+                async with session.post(ping_url, headers=headers, json=ping_data) as response:
                     if response.status == 200:
                         break
-        except:
-            pass
+                    else:
+                        print(f"Unexpected status code {response.status} received from {ping_url}")
+        except aiohttp.ClientError as e:
+            print(f"HTTP request failed: {e}")
         await asyncio.sleep(check_interval)
+    
     return time.time() - start_time
 
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, token=None):
     prompts = load_prompts('databricks-dolly-15k.jsonl')
-    wait_time = await wait_for_service(url)
-    print(f"Service became available after {wait_time} seconds.")
+    wait_time = await wait_for_service(url, framework, model)
+    print(f"Service became available after {wait_time} seconds.")    
+    ping_url = get_ping_url(url, framework)
+    ping_data = get_ping_data(framework, model)
+
+    headers = {"Content-Type": "application/json"}
+    if framework == 'deepinfra':
+        headers["Authorization"] = f"Bearer {token}"
 
     for num_clients in num_clients_list:
         response_times = []
         async with aiohttp.ClientSession() as session:
             for _ in range(5):
                 time_start = time.time()
-                async with session.get(url) as response:
-                    assert response.status == 200
-                response_times.append(time.time() - time_start)
+                try:
+                    async with session.post(ping_url, headers=headers, json=ping_data) as response:
+                        if response.status == 200:
+                            response_times.append(time.time() - time_start)
+                        else:
+                            print(f"Unexpected status code {response.status} received from {ping_url}")
+                            response_times.append(float('inf')) 
+                except aiohttp.ClientError as e:
+                    print(f"HTTP request failed: {e}")
+                    response_times.append(float('inf')) 
                 await asyncio.sleep(0.3)
-            ping_latency = sum(response_times) / len(response_times)
+                
+            ping_latency = sum(rt for rt in response_times if rt < float('inf')) / len(response_times)
             print(f"Ping latency: {ping_latency}")
 
             collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
@@ -394,6 +456,8 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run benchmark on an API')

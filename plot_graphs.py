@@ -5,11 +5,12 @@ import argparse
 
 def generate_framework_cu_plots(model_name):
     directory = os.path.join('metrics', model_name)
+    print(directory)
     output_directory = os.path.join('plots', model_name)
     os.makedirs(output_directory, exist_ok=True)
 
     # Predefined CU levels
-    predefined_cus = ['1CU', '5CU', '10CU', '50CU', '100CU']
+    predefined_cus = ['CU_1', 'CU_5', 'CU_10', 'CU_50', 'CU_100']
     data = {cu: {} for cu in predefined_cus}
 
     # Process each file
@@ -18,20 +19,20 @@ def generate_framework_cu_plots(model_name):
             if filename.endswith('.xlsx'):
                 parts = filename.split('_')
                 framework = parts[2]
-                cu = parts[3]
-                gpu = parts[3].split('.')[0]
-
-                # Validate and adjust CU if it doesn't match predefined ones
-                if cu not in data:
-                    print(f"Warning: '{cu}' is not a recognized CU level. Skipping file: {filename}")
-                    continue
 
                 filepath = os.path.join(directory, filename)
-                df = pd.read_excel(filepath)
 
-                if framework not in data[cu]:
-                    data[cu][framework] = []
-                data[cu][framework].append(df)
+                # Read each sheet corresponding to a CU
+                for cu in predefined_cus:
+                    if cu in data:
+                        try:
+                            df = pd.read_excel(filepath, sheet_name=cu)
+                            if framework not in data[cu]:
+                                data[cu][framework] = []
+                            data[cu][framework].append(df)
+                        except ValueError:
+                            print(f"Warning: Sheet '{cu}' not found in file: {filename}")
+                            continue
 
     # Generate plots for each CU
     for cu, frameworks in data.items():
