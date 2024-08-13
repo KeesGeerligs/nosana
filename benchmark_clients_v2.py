@@ -309,7 +309,7 @@ class UserSpawner:
                 task.cancel()
 
 
-    async def aimd_loop(self, session, adjust_interval=5, sampling_interval=5, ss_delta=1):
+    async def aimd_loop(self, session, adjust_interval=1, sampling_interval=5, ss_delta=2):
         def linear_regression(x, y):
             x = tuple((i, 1) for i in x)
             y = tuple(i for i in y)
