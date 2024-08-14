@@ -178,10 +178,12 @@ class User:
                 "num_predict": 512
             }
         elif self.framework == 'lmdeploy':
-            url = f"{self.base_url}/v1/chat/completions"
+            url = f"{self.base_url}/v1/completions"
             data = {
                 "model": self.model,
-                "messages": [{"role": "user", "content": prompt['instruction'] + " " + prompt['context']}]
+                "prompt": prompt['instruction'] + " " + prompt['context'],
+                "max_tokens": 512,
+                "stop": ["\\n"]
             }
         elif self.framework == 'TGI':
             url = f"{self.base_url}/generate"
@@ -225,7 +227,8 @@ class User:
                         if self.framework in ['vllm']:
                             response_text = response_json['choices'][0]['text']
                         elif self.framework == 'lmdeploy':
-                            response_text = response_json['choices'][0]['message']['content']
+                            #print(response_json)
+                            response_text = response_json['choices'][0]['text']
                         elif self.framework == 'ollama':
                             response_text = await response.text()
                         elif self.framework == 'TGI':
@@ -351,7 +354,7 @@ def get_ping_url(base_url, framework):
     elif framework == 'ollama':
         return f"{base_url}/api/generate"
     elif framework == 'lmdeploy':
-        return f"{base_url}/v1/chat/completions"
+        return f"{base_url}/v1/completions"
     elif framework == 'TGI':
         return f"{base_url}/generate"
     elif framework == 'deepinfra':
@@ -376,7 +379,8 @@ def get_ping_data(framework, model):
     elif framework == 'lmdeploy':
         return {
             "model": model,
-            "messages": [{"role": "user", "content": "ping"}]
+            "prompt": "ping",
+            "max_tokens": 1
         }
     elif framework == 'TGI':
         return {
@@ -407,7 +411,7 @@ async def wait_for_service(base_url, framework, model, token=None, check_interva
                     if response.status == 200:
                         break
                     else:
-                        print(f"Unexpected status code {response.status} received from {ping_url}")
+                        print(f"Unexpected status {response} received from {ping_url}")
         except aiohttp.ClientError as e:
             print(f"HTTP request failed: {e}")
         await asyncio.sleep(check_interval)
@@ -465,7 +469,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds')
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
     parser.add_argument('--framework', type=str, choices=['vllm', 'ollama', 'lmdeploy', 'TGI', 'deepinfra'], help='Framework to use (vllm, ollama, lmdeploy, TGI, or deepinfra)')
-    parser.add_argument('--model', type=str, help='Model name to use')
+    parser.add_argument('--model', type=str, help='Model name to use', default='llama3.1')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
     parser.add_argument('--ping_correction', type=bool, default=True, help='Apply ping latency correction')
     parser.add_argument('--token', type=str, help='Authorization token for Deepinfra')

@@ -1,0 +1,35 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "lmdeploy-llama3.1-turbomind",
+        "args": {
+          "cmd": [
+            "timeout", 
+            "50m",
+            "lmdeploy",
+            "serve",
+            "api_server",
+            "../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396",
+            "--model-name",
+            "llama3.1"
+          ],
+          "image": "docker.io/openmmlab/lmdeploy:v0.5.3-cu12",
+          "gpu": true,
+          "expose": 23333,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
+              "target": "/root/"
+            }
+          ]
+        }
+      }
+    ]
+  }
