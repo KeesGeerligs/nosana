@@ -395,7 +395,7 @@ def get_ping_data(framework, model):
     else:
         raise ValueError("Unsupported framework")
 
-async def wait_for_service(base_url, framework, model, token=None, check_interval=10):
+async def wait_for_service(base_url, framework, model, token=None, check_interval=60):
     ping_url = get_ping_url(base_url, framework)
     ping_data = get_ping_data(framework, model)
 
@@ -411,7 +411,7 @@ async def wait_for_service(base_url, framework, model, token=None, check_interva
                     if response.status == 200:
                         break
                     else:
-                        print(f"Unexpected status {response} received from {ping_url}")
+                        print(f"Unexpected status {response.status} received from {ping_url}")
         except aiohttp.ClientError as e:
             print(f"HTTP request failed: {e}")
         await asyncio.sleep(check_interval)
