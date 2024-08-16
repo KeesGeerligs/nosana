@@ -3,9 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 
-def generate_framework_cu_plots(model_name_1, model_name_2):
-    directories = [os.path.join('metrics', model_name_1), os.path.join('metrics', model_name_2)]
-    output_directory = os.path.join('plots', f'{model_name_1}_vs_{model_name_2}')
+def generate_framework_cu_plots(model_names):
+    directories = [os.path.join('metrics', model_name) for model_name in model_names]
+    output_directory = os.path.join('plots', '_vs_'.join(model_names))
     os.makedirs(output_directory, exist_ok=True)
 
     # Predefined CU levels
@@ -58,13 +58,12 @@ def generate_framework_cu_plots(model_name_1, model_name_2):
         print("No data to plot.")
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate performance comparison plots for each CU level across two GPUs and frameworks.')
-    parser.add_argument('model_name_1', type=str, help='First directory name under "metrics" containing the data files.')
-    parser.add_argument('model_name_2', type=str, help='Second directory name under "metrics" containing the data files.')
+    parser = argparse.ArgumentParser(description='Generate performance comparison plots for each CU level across multiple GPUs and frameworks.')
+    parser.add_argument('model_names', type=str, nargs='+', help='Directory names under "metrics" containing the data files.')
 
     args = parser.parse_args()
     
-    generate_framework_cu_plots(args.model_name_1, args.model_name_2)
+    generate_framework_cu_plots(args.model_names)
 
 if __name__ == '__main__':
     main()

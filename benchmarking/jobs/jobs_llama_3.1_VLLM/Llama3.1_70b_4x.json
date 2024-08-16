@@ -1,0 +1,39 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "lmdeploy-llama3.1-turbomind",
+        "args": {
+          "cmd": [
+            "timeout", 
+            "50m",
+            "lmdeploy",
+            "serve",
+            "api_server",
+            "../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf",
+            "--model-name",
+            "llama3.1",
+            "--model-format",
+            "awq"
+          ],
+          "image": "docker.io/openmmlab/lmdeploy:v0.5.3-cu12",
+          "gpu": true,
+          "expose": 23333,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/70b/4x/models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+              "target": "/root/"
+            }
+          ]
+        }
+      }
+    ]
+}
+  
+  
