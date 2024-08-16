@@ -1,37 +1,34 @@
 {
-    "version": "0.1",
-    "type": "container",
-    "meta": {
-      "trigger": "cli"
-    },
-    "ops": [
-      {
-        "type": "container/run",
-        "id": "lmdeploy-llama3.1-turbomind",
-        "args": {
-          "cmd": [
-            "timeout", 
-            "50m",
-            "python3",
-            "-m",
-            "vllm.entrypoints.openai.api_server",
-            "../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91",
-            "--model",
-            "llama3.1",
-            "--quantization",
-            "awq"
-          ],
-          "image": "vllm/vllm-openai:latest",
-          "gpu": true,
-          "expose": 23333,
-          "resources": [
-            {
-              "type": "S3",
-              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
-              "target": "/root/"
-            }
-          ]
-        }
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "VLLM-llama3.1",
+      "args": {
+        "cmd": [
+          "--model",
+          "./root/models/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+          "--quantization",
+          "awq"
+        ],
+        "image": "vllm/vllm-openai:latest",
+        "gpu": true,
+        "expose": 23333,
+        "env": {
+          "HF_HUB_CACHE": "/models"
+        },
+        "resources": [
+          {
+            "type": "S3",
+            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/models"
+          }
+        ]
       }
-    ]
-  }
+    }
+  ]
+}
