@@ -182,8 +182,7 @@ class User:
             data = {
                 "model": self.model,
                 "prompt": prompt['instruction'] + " " + prompt['context'],
-                "max_tokens": 512,
-                "stop": ["\\n"]
+                "max_tokens": 512
             }
         elif self.framework == 'TGI':
             url = f"{self.base_url}/generate"
@@ -241,7 +240,7 @@ class User:
                         self.collector.collect_response_head_latency(time.time() - start_time)
                         if tokens == 0:
                             self.empty_response_count += 1
-                            print(f"User {self.user_id} Request {self.request_count}: 0 tokens. Response: {response_text}")
+                            print(f"User {self.user_id} Request {self.request_count}: 0 tokens. Response: {response} Response json: {response_json}")
                     else:
                         print(f"User {self.user_id} Request {self.request_count} received non-200 response: {response.status}")
         except Exception as e:

@@ -11,7 +11,7 @@
         "args": {
           "cmd": [
             "timeout", 
-            "45m",
+            "50m",
             "lmdeploy",
             "serve",
             "api_server",
