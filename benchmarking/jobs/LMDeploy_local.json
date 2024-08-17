@@ -10,12 +10,14 @@
       "id": "LMDeploy",
       "args": {
         "cmd": [
-          "-c ",
-          "timeout 110m",
-          " echo deploying LLM;",
-          " lmdeploy serve api_server Qwen/Qwen2-1.5B-Instruct"],
-        "image": "docker.io/openmmlab/lmdeploy:latest",
-        "entrypoint": "/bin/sh",
+          "lmdeploy",
+          "serve",
+          "api_server",
+          "--model-name",
+          "Qwen2-1.5B",
+          "Qwen/Qwen2-1.5B-Instruct"
+        ],
+        "image": "docker.io/openmmlab/lmdeploy:v0.5.3-cu12",
         "gpu": true,
         "expose": 23333,
         "env": {
