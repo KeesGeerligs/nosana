@@ -43,7 +43,7 @@ def generate_framework_cu_plots(model_names):
             for df in dfs:
                 plt.plot(df['Time (seconds)'], df['Tokens per Second'], label=key)
 
-        plt.title(f'Llama 3 8B total tokens per Second - {cu} Comparison')
+        plt.title(f'Llama 3.1 8B total tokens per Second - {cu} Comparison')
         plt.xlabel('Time (seconds)')
         plt.ylabel('Tokens per Second')
         plt.legend(title="Framework & GPU")
