@@ -10,6 +10,7 @@ import contextlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import math
 
 class MetricsCollector:
     def __init__(self, session_time=None, ping_latency=0.0):
@@ -226,9 +227,47 @@ class UserSpawner:
                     sleep_time = max((time.time() - self.target_time) / (current_users - self.target_user_count), 0)
                     await asyncio.sleep(sleep_time)
                 else:
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.01)
         except asyncio.CancelledError:
             await self.cancel_all_users()
+
+    async def aimd_loop(self, session, adjust_interval=1, sampling_interval=5, ss_delta=2):
+        def linear_regression(x, y):
+            x = tuple((i, 1) for i in x)
+            y = tuple(i for i in y)
+            a, b = np.linalg.lstsq(x, y, rcond=None)[0]
+            return a, b
+        
+        while True:
+            while True:
+                now = math.floor(time.time())
+                words_per_seconds = [
+                    self.data_collector.response_word_bucket[i]
+                    for i in range(now - sampling_interval, now)
+                ]
+                slope = linear_regression(
+                    range(len(words_per_seconds)), words_per_seconds
+                )[0]
+                if slope >= -0.01:
+                    cwnd = self.target_user_count
+                    target_cwnd = max(int(cwnd * (1 + ss_delta)), cwnd + 1)
+                    self.target_user_count = target_cwnd
+                    self.target_time = time.time() + adjust_interval
+                    print(f"SS: {cwnd} -> {target_cwnd}")
+                    await asyncio.sleep(adjust_interval)
+                else:
+                    cwnd = self.target_user_count
+                    target_cwnd = max(1, math.ceil(cwnd * 0.5))
+                    self.target_user_count = target_cwnd
+                    self.target_time = time.time() + adjust_interval
+                    print(f"SS Ended: {cwnd} -> {target_cwnd}")
+                    break
+
+            await self.sync()
+            await asyncio.sleep(min(adjust_interval, sampling_interval, 10))
+
+    async def sync(self):
+        await asyncio.sleep(0)  # Dummy function to simulate sync behavior
 
 async def wait_for_service(handler: FrameworkHandler, check_interval=30):
     ping_url = handler.get_request_url()
@@ -268,10 +307,12 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
         async with aiohttp.ClientSession() as session:
             user_spawner = UserSpawner(handler, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20)
             spawner_task = asyncio.create_task(user_spawner.spawner_loop(session))
+            aimd_task = asyncio.create_task(user_spawner.aimd_loop(session))
             report_task = asyncio.create_task(collector.report_loop(time_window=5))
             await asyncio.sleep(job_length + 1)
             await user_spawner.cancel_all_users()
             spawner_task.cancel()
+            aimd_task.cancel()
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
