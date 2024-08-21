@@ -282,7 +282,7 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
                     if response.status == 200:
                         break
                     else:
-                        #print(response)
+                        print(response)
                         print(f"Unexpected status {response.status} received from {ping_url}")
         except aiohttp.ClientError as e:
             print(f"HTTP request failed: {e}")
