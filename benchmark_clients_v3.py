@@ -253,14 +253,14 @@ class UserSpawner:
                     target_cwnd = max(int(cwnd * (1 + ss_delta)), cwnd + 1)
                     self.target_user_count = target_cwnd
                     self.target_time = time.time() + adjust_interval
-                    print(f"SS: {cwnd} -> {target_cwnd}")
+                    #print(f"SS: {cwnd} -> {target_cwnd}")
                     await asyncio.sleep(adjust_interval)
                 else:
                     cwnd = self.target_user_count
                     target_cwnd = max(1, math.ceil(cwnd * 0.5))
                     self.target_user_count = target_cwnd
                     self.target_time = time.time() + adjust_interval
-                    print(f"SS Ended: {cwnd} -> {target_cwnd}")
+                    #print(f"SS Ended: {cwnd} -> {target_cwnd}")
                     break
 
             await self.sync()

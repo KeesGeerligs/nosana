@@ -1,0 +1,33 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "TGI-llama3.1",
+      "args": {
+        "cmd": [
+          "--model-id",
+          "/root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91",
+          "--quantize",
+          "awq",
+          "--port",
+          "8080"
+        ],
+        "image": "ghcr.io/huggingface/text-generation-inference:2.2.0",
+        "gpu": true,
+        "expose": 8080,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4"
+          }
+        ]
+      }
+    }
+  ]
+}
