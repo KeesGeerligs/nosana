@@ -197,39 +197,32 @@ class UserSpawner:
         self.data_collector = collector
         self.handler = handler
         self.prompts = prompts
-        self.user_list = []
+        self.semaphore = asyncio.Semaphore(self.target_user_count)
 
     async def user_loop(self, session, user_id):
-        user = User(session, self.handler, self.data_collector, self.prompts, user_id)
-        await user.user_loop()
+        async with self.semaphore:
+            user = User(session, self.handler, self.data_collector, self.prompts, user_id)
+            await user.user_loop()
 
     def spawn_user(self, session, user_id):
         task = asyncio.create_task(self.user_loop(session, user_id))
-        self.user_list.append(task)
-
-    async def cancel_all_users(self):
-        while self.user_list:
-            user = self.user_list.pop()
-            user.cancel()
-        await asyncio.sleep(0)
+        return task
 
     async def spawner_loop(self, session):
         try:
+            current_users = []
             while True:
-                current_users = len(self.user_list)
-                if current_users < self.target_user_count:
-                    self.spawn_user(session, current_users)
-                    sleep_time = max((self.target_time - time.time()) / (self.target_user_count - current_users), 0)
-                    await asyncio.sleep(sleep_time)
-                elif current_users > self.target_user_count:
-                    user = self.user_list.pop()
-                    user.cancel()
-                    sleep_time = max((time.time() - self.target_time) / (current_users - self.target_user_count), 0)
-                    await asyncio.sleep(sleep_time)
-                else:
-                    await asyncio.sleep(0.01)
+                if len(current_users) < self.target_user_count:
+                    task = self.spawn_user(session, len(current_users))
+                    current_users.append(task)
+                await asyncio.sleep(0.01)
+
+                # Clean up completed tasks
+                current_users = [task for task in current_users if not task.done()]
         except asyncio.CancelledError:
-            await self.cancel_all_users()
+            for task in current_users:
+                task.cancel()
+            await asyncio.gather(*current_users, return_exceptions=True)
 
     async def aimd_loop(self, session, adjust_interval=1, sampling_interval=5, ss_delta=2):
         def linear_regression(x, y):
@@ -237,7 +230,7 @@ class UserSpawner:
             y = tuple(i for i in y)
             a, b = np.linalg.lstsq(x, y, rcond=None)[0]
             return a, b
-        
+
         while True:
             while True:
                 now = math.floor(time.time())
@@ -253,42 +246,19 @@ class UserSpawner:
                     target_cwnd = max(int(cwnd * (1 + ss_delta)), cwnd + 1)
                     self.target_user_count = target_cwnd
                     self.target_time = time.time() + adjust_interval
-                    #print(f"SS: {cwnd} -> {target_cwnd}")
                     await asyncio.sleep(adjust_interval)
                 else:
                     cwnd = self.target_user_count
                     target_cwnd = max(1, math.ceil(cwnd * 0.5))
                     self.target_user_count = target_cwnd
                     self.target_time = time.time() + adjust_interval
-                    #print(f"SS Ended: {cwnd} -> {target_cwnd}")
                     break
 
             await self.sync()
             await asyncio.sleep(min(adjust_interval, sampling_interval, 10))
 
     async def sync(self):
-        await asyncio.sleep(0)  # Dummy function to simulate sync behavior
-
-async def wait_for_service(handler: FrameworkHandler, check_interval=30):
-    ping_url = handler.get_request_url()
-    ping_data = handler.get_request_data("ping")
-    headers = handler.get_headers()
-
-    start_time = time.time()
-    while True:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(ping_url, headers=headers, json=ping_data) as response:
-                    if response.status == 200:
-                        break
-                    else:
-                        #print(response)
-                        print(f"Unexpected status {response.status} received from {ping_url}")
-        except aiohttp.ClientError as e:
-            print(f"HTTP request failed: {e}")
-        await asyncio.sleep(check_interval)
-    
-    return time.time() - start_time
+        await asyncio.sleep(0)  
 
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, token=None):
     prompts = load_prompts('databricks-dolly-15k.jsonl')
@@ -316,6 +286,30 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
+
+
+async def wait_for_service(handler: FrameworkHandler, check_interval=30):
+    ping_url = handler.get_request_url()
+    ping_data = handler.get_request_data("ping")
+    headers = handler.get_headers()
+
+    start_time = time.time()
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(ping_url, headers=headers, json=ping_data) as response:
+                    if response.status == 200:
+                        break
+                    else:
+                        #print(response)
+                        print(f"Unexpected status {response.status} received from {ping_url}")
+        except aiohttp.ClientError as e:
+            print(f"HTTP request failed: {e}")
+        await asyncio.sleep(check_interval)
+    
+    return time.time() - start_time
+
+
 
 async def get_ping_latencies(handler: FrameworkHandler, num_samples):
     response_times = []
