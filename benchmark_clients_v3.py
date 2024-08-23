@@ -297,7 +297,7 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
     print(f"Service became available after {wait_time} seconds.")
 
     for num_clients in num_clients_list:
-        response_times = await get_ping_latencies(handler, 5)
+        response_times = await get_ping_latencies(handler, 1)
         ping_latency = sum(rt for rt in response_times if rt < float('inf')) / len(response_times)
         print(f"Ping latency: {ping_latency}")
 
@@ -326,10 +326,11 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
     headers = handler.get_headers()
 
 
-    # Construct the curl command
     headers_curl = " ".join([f'-H "{key}: {value}"' for key, value in headers.items()])
     data_curl = json.dumps(ping_data)
-    curl_command = f'curl --request POST --url {ping_url} {headers_curl} --data \'{data_curl}\''
+    escaped_data_curl = data_curl.replace('"', '\\"')
+
+    curl_command = f'curl --request POST --url {ping_url} {headers_curl} --data "{escaped_data_curl}"'
     
     print("Equivalent curl command:")
     print(curl_command)
@@ -356,6 +357,7 @@ async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_
     response_times = []
     async with aiohttp.ClientSession() as session:
         for _ in range(num_samples):
+            print("pizza")
             time_start = time.time()
             endpoint = "/health" if use_health_check else "/v1/models"
             url = f"{handler.base_url}{endpoint}"
