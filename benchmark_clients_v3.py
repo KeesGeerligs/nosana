@@ -131,30 +131,35 @@ class MetricsCollector:
         plt.show()
 
 class FrameworkHandler:
-    def __init__(self, framework, base_url, model, token=None, endpoint='/v1/chat/completions'):
+    def __init__(self, framework, base_url, model, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
         self.framework = framework
         self.base_url = base_url
         self.model = model
         self.token = token
         self.endpoint = endpoint
+        self.use_prompt_field = use_prompt_field  # New flag to use prompt field
 
     def get_request_url(self):
         return f"{self.base_url}{self.endpoint}"
 
-
     def get_request_data(self, prompt):
-        return {
-            "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 512
-        }
+        if self.use_prompt_field:
+            return {
+                "model": self.model,
+                "prompt": prompt,
+                "max_tokens": 512
+            }
+        else:
+            return {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 512
+            }
 
     def get_headers(self):
         headers = {"Content-Type": "application/json"}
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
-        else:
-            print("Warning: No token provided for authorization!")
         return headers
 
 class User:
@@ -181,8 +186,12 @@ class User:
                     self.collector.collect_response_status(response.status)
                     if response.status == 200:
                         response_json = await response.json()
-                        #print(response_json, flush=True)
-                        response_text = response_json['choices'][0]['message']['content']
+
+                        if self.handler.use_prompt_field:
+                            response_text = response_json['choices'][0]['text']
+                        else:
+                            response_text = response_json['choices'][0]['message']['content']
+
                         tokens = len(response_text.split())
                         self.collector.collect_tokens(tokens)
                         self.tokens += tokens
@@ -190,7 +199,6 @@ class User:
                         print(f"Unexpected status {response.status} received for request {self.request_count}", flush=True)
         except Exception as e:
             print(f"User {self.user_id} Request {self.request_count} failed: {e}", flush=True)
-
 
     async def user_loop(self):
         while True:
@@ -295,9 +303,9 @@ def load_prompts(file_path, max_tokens=512):
 
 
 
-async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions'):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
-    handler = FrameworkHandler(framework, url, model, token, endpoint)
+    handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)  # Pass the flag here
     wait_time = await wait_for_service(handler)
     print(f"Service became available after {wait_time} seconds.")
 
@@ -323,6 +331,7 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
+
 
 
 
@@ -411,9 +420,8 @@ if __name__ == "__main__":
     parser.add_argument('--ping_correction', action='store_true', help='Apply ping latency correction')
     parser.add_argument('--token', type=str, help='Authorization token')
     parser.add_argument('--endpoint', type=str, help='API endpoint for the requests', default='/v1/chat/completions')
+    parser.add_argument('--use_prompt_field', action='store_true', help='Use the prompt field instead of messages')
     args = parser.parse_args()
 
-
-
     print(f"Running benchmark series with {args.num_clients_list} concurrent clients for {args.job_length} seconds each on {args.url} with model {args.model}...")
-    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.enable_aimd, args.token, args.endpoint))
+    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.enable_aimd, args.token, args.endpoint, args.use_prompt_field))
