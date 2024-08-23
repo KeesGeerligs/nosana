@@ -179,13 +179,16 @@ class User:
                     self.collector.collect_response_status(response.status)
                     if response.status == 200:
                         response_json = await response.json()
-                        #print(response_json)
+                        #print(response_json, flush=True)
                         response_text = response_json['choices'][0]['message']['content']
                         tokens = len(response_text.split())
                         self.collector.collect_tokens(tokens)
                         self.tokens += tokens
+                    else:
+                        print(f"Unexpected status {response.status} received for request {self.request_count}", flush=True)
         except Exception as e:
-            print(f"User {self.user_id} Request {self.request_count} failed: {e}")
+            print(f"User {self.user_id} Request {self.request_count} failed: {e}", flush=True)
+
 
     async def user_loop(self):
         while True:
@@ -297,7 +300,7 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
     print(f"Service became available after {wait_time} seconds.")
 
     for num_clients in num_clients_list:
-        response_times = await get_ping_latencies(handler, 1)
+        response_times = await get_ping_latencies(handler, 5)
         ping_latency = sum(rt for rt in response_times if rt < float('inf')) / len(response_times)
         print(f"Ping latency: {ping_latency}")
 
@@ -355,23 +358,37 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
 
 async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_check=False):
     response_times = []
-    async with aiohttp.ClientSession() as session:
-        for _ in range(num_samples):
-            print("pizza")
+    timeout = aiohttp.ClientTimeout(total=10)
+
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        for i in range(num_samples):
+            print(f"Starting request {i+1}...")
             time_start = time.time()
             endpoint = "/health" if use_health_check else "/v1/models"
             url = f"{handler.base_url}{endpoint}"
+            
             try:
                 async with session.get(url, headers=handler.get_headers()) as response:
                     if response.status == 200:
                         response_times.append(time.time() - time_start)
+                        print(f"Request {i+1} completed in {response_times[-1]:.4f} seconds")
                     else:
                         print(f"Unexpected status code {response.status} received from {url}")
                         response_times.append(float('inf')) 
             except aiohttp.ClientError as e:
-                print(f"HTTP request failed: {e}")
+                print(f"HTTP request {i+1} failed: {e}")
                 response_times.append(float('inf')) 
-            await asyncio.sleep(0.3)
+            except asyncio.TimeoutError:
+                print(f"Request {i+1} timed out.")
+                response_times.append(float('inf'))
+            except Exception as e:
+                print(f"An unexpected error occurred during request {i+1}: {e}")
+                response_times.append(float('inf'))
+            finally:
+                print(f"Finished request {i+1}. Sleeping for .3 seconds.")
+                await asyncio.sleep(0.3)
+
+    print("All requests completed.")
     return response_times
 
 def load_prompts(file_path):
