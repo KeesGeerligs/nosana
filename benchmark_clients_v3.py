@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import math
+import re
 
 class MetricsCollector:
     def __init__(self, session_time=None, ping_latency=0.0):
@@ -183,7 +184,6 @@ class User:
                         tokens = len(response_text.split())
                         self.collector.collect_tokens(tokens)
                         self.tokens += tokens
-                        #self.collector.collect_response_head_latency(time.time() - start_time)
         except Exception as e:
             print(f"User {self.user_id} Request {self.request_count} failed: {e}")
 
@@ -200,7 +200,7 @@ class UserSpawner:
         self.handler = handler
         self.prompts = prompts
         self.semaphore = asyncio.Semaphore(self.target_user_count)
-        self.user_tasks = []  # Track user tasks
+        self.user_tasks = [] 
 
     async def user_loop(self, session, user_id):
         async with self.semaphore:
@@ -221,7 +221,6 @@ class UserSpawner:
                     current_users.append(task)
                 await asyncio.sleep(0.01)
 
-                # Clean up completed tasks
                 current_users = [task for task in current_users if not task.done()]
         except asyncio.CancelledError:
             for task in current_users:
@@ -270,8 +269,29 @@ class UserSpawner:
         await asyncio.gather(*self.user_tasks, return_exceptions=True)
         self.user_tasks.clear()
 
+
+
+def count_tokens(text):
+    tokens = re.findall(r'\S+', text)
+    return len(tokens)
+
+def filter_prompts(prompts, max_tokens=512):
+    filtered_prompts = []
+    for prompt in prompts:
+        total_tokens = count_tokens(prompt['instruction']) + count_tokens(prompt['context'])
+        if total_tokens <= max_tokens:
+            filtered_prompts.append(prompt)
+    return filtered_prompts
+
+def load_prompts(file_path, max_tokens=512):
+    with open(file_path, 'r') as f:
+        all_prompts = [json.loads(line) for line in f if line.strip()]
+    return filter_prompts(all_prompts, max_tokens)
+
+
+
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None):
-    prompts = load_prompts('databricks-dolly-15k.jsonl')
+    prompts = load_prompts('databricks-dolly-15k.jsonl')  
     handler = FrameworkHandler(framework, url, model, token)
     wait_time = await wait_for_service(handler)
     print(f"Service became available after {wait_time} seconds.")
@@ -361,7 +381,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_clients_list', type=int, nargs='+', help='List of concurrent clients to test with', default=[100, 50, 10, 5, 1])
     parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds', default=300)
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
-    parser.add_argument('--framework', type=str, choices=['standard', 'deepinfra', 'fireworks'], help='Framework to use', default="standard")
+    parser.add_argument('--framework', type=str, choices=['standard', 'token_API'], help='API endpoint to use', default="standard")
     parser.add_argument('--model', type=str, help='Model name to use', default='llama3.1')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
     parser.add_argument('--enable_aimd', action='store_true', help='Enable AIMD control')
