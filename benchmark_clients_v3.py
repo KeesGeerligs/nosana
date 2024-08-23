@@ -311,17 +311,19 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
 
 
 
-async def get_ping_latencies(handler: FrameworkHandler, num_samples):
+async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_check=False):
     response_times = []
     async with aiohttp.ClientSession() as session:
         for _ in range(num_samples):
             time_start = time.time()
+            endpoint = "/health" if use_health_check else "/v1/models"
+            url = f"{handler.base_url}{endpoint}"
             try:
-                async with session.post(handler.get_request_url(), headers=handler.get_headers(), json=handler.get_request_data("ping")) as response:
+                async with session.get(url, headers=handler.get_headers()) as response:
                     if response.status == 200:
                         response_times.append(time.time() - time_start)
                     else:
-                        print(f"Unexpected status code {response.status} received from {handler.get_request_url()}")
+                        print(f"Unexpected status code {response.status} received from {url}")
                         response_times.append(float('inf')) 
             except aiohttp.ClientError as e:
                 print(f"HTTP request failed: {e}")
