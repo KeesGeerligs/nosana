@@ -131,14 +131,16 @@ class MetricsCollector:
         plt.show()
 
 class FrameworkHandler:
-    def __init__(self, framework, base_url, model, token=None):
+    def __init__(self, framework, base_url, model, token=None, endpoint='/v1/chat/completions'):
         self.framework = framework
         self.base_url = base_url
         self.model = model
         self.token = token
+        self.endpoint = endpoint
 
     def get_request_url(self):
-        return f"{self.base_url}/v1/chat/completions"
+        return f"{self.base_url}{self.endpoint}"
+
 
     def get_request_data(self, prompt):
         return {
@@ -293,9 +295,9 @@ def load_prompts(file_path, max_tokens=512):
 
 
 
-async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions'):
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
-    handler = FrameworkHandler(framework, url, model, token)
+    handler = FrameworkHandler(framework, url, model, token, endpoint)
     wait_time = await wait_for_service(handler)
     print(f"Service became available after {wait_time} seconds.")
 
@@ -321,6 +323,8 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
+
+
 
 
 async def wait_for_service(handler: FrameworkHandler, check_interval=30):
@@ -406,9 +410,10 @@ if __name__ == "__main__":
     parser.add_argument('--enable_aimd', action='store_true', help='Enable AIMD control')
     parser.add_argument('--ping_correction', action='store_true', help='Apply ping latency correction')
     parser.add_argument('--token', type=str, help='Authorization token')
+    parser.add_argument('--endpoint', type=str, help='API endpoint for the requests', default='/v1/chat/completions')
     args = parser.parse_args()
 
 
 
     print(f"Running benchmark series with {args.num_clients_list} concurrent clients for {args.job_length} seconds each on {args.url} with model {args.model}...")
-    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.enable_aimd, args.token))
+    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.enable_aimd, args.token, args.endpoint))
