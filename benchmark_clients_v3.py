@@ -148,8 +148,10 @@ class FrameworkHandler:
 
     def get_headers(self):
         headers = {"Content-Type": "application/json"}
-        if self.framework == 'deepinfra':
+        if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
+        else:
+            print("Warning: No token provided for authorization!")
         return headers
 
 class User:
@@ -198,6 +200,7 @@ class UserSpawner:
         self.handler = handler
         self.prompts = prompts
         self.semaphore = asyncio.Semaphore(self.target_user_count)
+        self.user_tasks = []  # Track user tasks
 
     async def user_loop(self, session, user_id):
         async with self.semaphore:
@@ -206,6 +209,7 @@ class UserSpawner:
 
     def spawn_user(self, session, user_id):
         task = asyncio.create_task(self.user_loop(session, user_id))
+        self.user_tasks.append(task)
         return task
 
     async def spawner_loop(self, session):
@@ -258,9 +262,15 @@ class UserSpawner:
             await asyncio.sleep(min(adjust_interval, sampling_interval, 10))
 
     async def sync(self):
-        await asyncio.sleep(0)  
+        await asyncio.sleep(0)
+        
+    async def cancel_all_users(self):
+        for task in self.user_tasks:
+            task.cancel()
+        await asyncio.gather(*self.user_tasks, return_exceptions=True)
+        self.user_tasks.clear()
 
-async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, token=None):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None):
     prompts = load_prompts('databricks-dolly-15k.jsonl')
     handler = FrameworkHandler(framework, url, model, token)
     wait_time = await wait_for_service(handler)
@@ -277,12 +287,14 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
         async with aiohttp.ClientSession() as session:
             user_spawner = UserSpawner(handler, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20)
             spawner_task = asyncio.create_task(user_spawner.spawner_loop(session))
-            aimd_task = asyncio.create_task(user_spawner.aimd_loop(session))
+            if enable_aimd:
+                aimd_task = asyncio.create_task(user_spawner.aimd_loop(session))
             report_task = asyncio.create_task(collector.report_loop(time_window=5))
             await asyncio.sleep(job_length + 1)
             await user_spawner.cancel_all_users()
             spawner_task.cancel()
-            aimd_task.cancel()
+            if enable_aimd:
+                aimd_task.cancel()
             report_task.cancel()
             collector.final_report()
             collector.save_to_excel(sheet_name=f'CU_{num_clients}')
@@ -292,6 +304,15 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
     ping_url = handler.get_request_url()
     ping_data = handler.get_request_data("ping")
     headers = handler.get_headers()
+
+
+    # Construct the curl command
+    headers_curl = " ".join([f'-H "{key}: {value}"' for key, value in headers.items()])
+    data_curl = json.dumps(ping_data)
+    curl_command = f'curl --request POST --url {ping_url} {headers_curl} --data \'{data_curl}\''
+    
+    print("Equivalent curl command:")
+    print(curl_command)
 
     start_time = time.time()
     while True:
@@ -338,14 +359,17 @@ def load_prompts(file_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run benchmark on an API')
     parser.add_argument('--num_clients_list', type=int, nargs='+', help='List of concurrent clients to test with', default=[100, 50, 10, 5, 1])
-    parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds', default="300")
+    parser.add_argument('--job_length', type=int, help='Duration of the benchmark job in seconds', default=300)
     parser.add_argument('--url', type=str, help='URL of the API endpoint')
-    parser.add_argument('--framework', type=str, choices=['standard', 'deepinfra'], help='Framework to use', default="standard")
+    parser.add_argument('--framework', type=str, choices=['standard', 'deepinfra', 'fireworks'], help='Framework to use', default="standard")
     parser.add_argument('--model', type=str, help='Model name to use', default='llama3.1')
     parser.add_argument('--run_name', type=str, default='metrics_report', help='Name of the run for saving files')
-    parser.add_argument('--ping_correction', type=bool, default=True, help='Apply ping latency correction')
-    parser.add_argument('--token', type=str, help='Authorization token for Deepinfra')
+    parser.add_argument('--enable_aimd', action='store_true', help='Enable AIMD control')
+    parser.add_argument('--ping_correction', action='store_true', help='Apply ping latency correction')
+    parser.add_argument('--token', type=str, help='Authorization token')
     args = parser.parse_args()
 
+
+
     print(f"Running benchmark series with {args.num_clients_list} concurrent clients for {args.job_length} seconds each on {args.url} with model {args.model}...")
-    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.token))
+    asyncio.run(run_benchmark_series(args.num_clients_list, args.job_length, args.url, args.framework, args.model, args.run_name, args.ping_correction, args.enable_aimd, args.token))
