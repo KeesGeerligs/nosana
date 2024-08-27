@@ -7,19 +7,19 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "VLLM-llama3.1",
+      "id": "TGI-llama3.1",
       "args": {
         "cmd": [
-          "--model",
+          "--model-id",
           "/root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4/snapshots/2123003760781134cfc31124aa6560a45b491fdf",
-          "--served-model-name",
-          "llama3.1",
-          "--quantization",
-          "awq"
+          "--quantize",
+          "awq",
+          "--port",
+          "8080"
         ],
-        "image": "docker.io/vllm/vllm-openai:v0.5.4",
+        "image": "ghcr.io/huggingface/text-generation-inference:2.2.0",
         "gpu": true,
-        "expose": 8000,
+        "expose": 8080,
         "resources": [
           {
             "type": "S3",
