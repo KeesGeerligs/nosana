@@ -29,6 +29,7 @@ class MetricsCollector:
         self.run_name = "metrics_report"
         self.session_time = session_time
         self.ping_latency = ping_latency
+        self.lock = asyncio.Lock()  # Added lock for synchronization
 
     @contextlib.contextmanager
     def collect_http_request(self):
@@ -62,18 +63,19 @@ class MetricsCollector:
         try:
             while True:
                 await asyncio.sleep(time_window)
-                current_time = time.time()
-                report_time = int(current_time - self.start_time)
-                tokens_per_second = self.total_tokens / (current_time - self.start_time)
-                self.time_series.append(report_time)
-                self.tokens_per_second_series.append(tokens_per_second)
-                self.print_report(report_time, tokens_per_second)
+                async with self.lock:  # Ensure report and save steps are synchronized
+                    current_time = time.time()
+                    report_time = int(current_time - self.start_time)
+                    tokens_per_second = self.total_tokens / (current_time - self.start_time)
+                    self.time_series.append(report_time)
+                    self.tokens_per_second_series.append(tokens_per_second)
+                    self.print_report(report_time, tokens_per_second)
                 
                 if self.session_time and report_time >= self.session_time:
-                    self.final_report()
+                    await self.final_report()  # Ensure final report is called with lock
                     break
         except asyncio.CancelledError:
-            self.final_report()
+            await self.final_report()
             print("Report loop cancelled")
 
     def print_report(self, report_time, tokens_per_second):
@@ -90,31 +92,42 @@ class MetricsCollector:
         print(f"Total Tokens Produced: {self.total_tokens}")
         print()
 
-    def final_report(self):
-        total_duration = time.time() - self.start_time
-        print("Final Report")
-        print(f"Total Duration: {total_duration} seconds")
-        print(f"Total Tokens Produced: {self.total_tokens}")
-        print(f"Total Tokens per Second: {self.total_tokens / total_duration}")
-        print(f"Total Requests Made: {self.total_requests}")
+    async def final_report(self):
+        async with self.lock:  # Ensure final report and save steps are synchronized
+            total_duration = time.time() - self.start_time
+            print("Final Report")
+            print(f"Total Duration: {total_duration} seconds")
+            print(f"Total Tokens Produced: {self.total_tokens}")
+            print(f"Total Tokens per Second: {self.total_tokens / total_duration}")
+            print(f"Total Requests Made: {self.total_requests}")
+            await self.save_to_excel(sheet_name=f'CU_{self.total_requests}')
 
-    def save_to_excel(self, sheet_name='Metrics'):
-        os.makedirs("metrics", exist_ok=True)
-        filename = f"metrics/{self.run_name}.xlsx"
+    async def save_to_excel(self, sheet_name='Metrics'):
+        async with self.lock:  # Ensure the save operation is thread-safe
+            os.makedirs("metrics", exist_ok=True)
+            filename = f"metrics/{self.run_name}.xlsx"
 
-        min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
-        data = {
-            'Time (seconds)': self.time_series[:min_length],
-            'Tokens per Second': self.tokens_per_second_series[:min_length],
-            'Latency (seconds)': self.latency_series[:min_length]
-        }
+            # Ensure that the time series and other series are of the same length
+            min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
+            if len(self.time_series) != min_length:
+                print(f"Warning: time_series length adjusted from {len(self.time_series)} to {min_length}.")
+            if len(self.tokens_per_second_series) != min_length:
+                print(f"Warning: tokens_per_second_series length adjusted from {len(self.tokens_per_second_series)} to {min_length}.")
+            if len(self.latency_series) != min_length:
+                print(f"Warning: latency_series length adjusted from {len(self.latency_series)} to {min_length}.")
 
-        df = pd.DataFrame(data)
-        with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
-            if sheet_name in writer.book.sheetnames:
-                del writer.book[sheet_name]
-            df.to_excel(writer, index=False, sheet_name=sheet_name)
-        print(f"Metrics saved to {filename}")
+            data = {
+                'Time (seconds)': self.time_series[:min_length],
+                'Tokens per Second': self.tokens_per_second_series[:min_length],
+                'Latency (seconds)': self.latency_series[:min_length]
+            }
+
+            df = pd.DataFrame(data)
+            with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
+                if sheet_name in writer.book.sheetnames:
+                    del writer.book[sheet_name]
+                df.to_excel(writer, index=False, sheet_name=sheet_name)
+            print(f"Metrics saved to {filename}")
 
     def plot(self):
         self.plot_series('Tokens per Second', self.tokens_per_second_series, 'Tokens/s')
@@ -129,6 +142,7 @@ class MetricsCollector:
         plt.legend()
         plt.grid(True)
         plt.show()
+
 
 class FrameworkHandler:
     def __init__(self, framework, base_url, model, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):

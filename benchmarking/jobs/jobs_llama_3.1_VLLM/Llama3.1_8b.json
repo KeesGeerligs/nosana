@@ -13,7 +13,9 @@
           "--model",
           "/root/.cache/huggingface/hub/models--unsloth--Meta-Llama-3.1-8B/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396",
           "--served-model-name",
-          "llama3.1"
+          "llama3.1",
+          "--max-model-len",
+          "42688"
         ],
         "image": "docker.io/vllm/vllm-openai:v0.5.4",
         "gpu": true,
