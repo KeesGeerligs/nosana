@@ -1,0 +1,26 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "lm-benchmark-llama3.1",
+        "args": {
+          "cmd": ["timeout", "30m"],
+          "image": "docker.io/ben1t0/lm_bench:new",
+          "gpu": true,
+          "expose": 23333,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
+              "target": "/root/"
+            }
+          ]
+        }
+      }
+    ]
+  }
