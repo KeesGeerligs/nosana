@@ -1,0 +1,19 @@
+# Use the lmdeploy image as the base
+FROM docker.io/openmmlab/lmdeploy:v0.5.3-cu12
+
+# Install git and any other necessary dependencies
+RUN apt-get update && apt-get install -y git
+
+# Clone and install your GitHub repo
+RUN git clone https://github.com/b-Snaas/nos_bench.git /lm-benchmark
+WORKDIR /lm-benchmark
+RUN pip install -e .
+
+# Copy the bash script into the image
+COPY run_benchmark.sh /lm-benchmark/run_benchmark.sh
+
+# Make the script executable
+RUN chmod +x run_benchmark.sh
+
+# Set the entrypoint to the bash script
+ENTRYPOINT ["/lm-benchmark/run_benchmark.sh"]
