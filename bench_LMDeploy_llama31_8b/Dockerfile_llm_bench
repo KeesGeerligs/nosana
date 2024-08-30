@@ -5,7 +5,7 @@ FROM docker.io/openmmlab/lmdeploy:v0.5.3-cu12
 RUN apt-get update && apt-get install -y git
 
 # Clone and install your GitHub repo
-RUN git clone https://github.com/b-Snaas/nos_bench.git /lm-benchmark
+RUN git clone https://github.com/KeesGeerligs/nos_bench.git /lm-benchmark
 WORKDIR /lm-benchmark
 RUN pip install -e .
 

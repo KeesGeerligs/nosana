@@ -11,9 +11,11 @@
         "args": {
           "cmd": ["timeout",
                   "30m"],
-          "image": "",
+          "image": "docker.io/k1llahkeezy/llm_bench:latest",
           "gpu": true,
           "expose": 23333,
+          "env": {
+          "TRANSFORMERS_CACHE": "/lm-benchmark/cache"},
           "resources": [
             {
               "type": "S3",
