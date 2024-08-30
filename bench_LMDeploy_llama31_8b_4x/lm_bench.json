@@ -15,12 +15,12 @@
           "gpu": true,
           "expose": 23333,
           "env": {
-          "TRANSFORMERS_CACHE": "/lm-benchmark/cache"},
+          "HF_HOME": "/lm-benchmark/cache/hub"},
           "resources": [
             {
               "type": "S3",
               "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
-              "target": "/root/"
+              "target": "/lm-benchmark/cache/"
             }
           ]
         }
