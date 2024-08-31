@@ -1,29 +1,30 @@
 {
-    "version": "0.1",
-    "type": "container",
-    "meta": {
-      "trigger": "cli"
-    },
-    "ops": [
-      {
-        "type": "container/run",
-        "id": "lm-benchmark-llama3.1",
-        "args": {
-          "cmd": ["timeout",
-                  "30m"],
-          "image": "docker.io/k1llahkeezy/llm_bench:latest",
-          "gpu": true,
-          "expose": 23333,
-          "env": {
-          "HF_HOME": "/lm-benchmark/cache/hub"},
-          "resources": [
-            {
-              "type": "S3",
-              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
-              "target": "/lm-benchmark/cache/"
-            }
-          ]
-        }
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "lm-benchmark-llama3.1",
+      "args": {
+        "cmd": [],
+        "image": "docker.io/k1llahkeezy/llm_bench_v1:latest",
+        "gpu": true,
+        "expose": 23333,
+        "env": {
+          "HF_HOME": "/root/.cache/huggingface/",
+          "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
+        },
+        "resources": [
+          {
+            "type": "S3",
+            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/"
+          }
+        ]
       }
-    ]
-  }
+    }
+  ]
+}
