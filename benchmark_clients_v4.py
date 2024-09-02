@@ -8,7 +8,6 @@ from collections import defaultdict
 import numpy as np
 import contextlib
 import matplotlib.pyplot as plt
-import pandas as pd
 import os
 import math
 import re
@@ -26,10 +25,9 @@ class MetricsCollector:
         self.time_series = []
         self.tokens_per_second_series = []
         self.latency_series = []
-        self.run_name = "metrics_report"
         self.session_time = session_time
         self.ping_latency = ping_latency
-        self.lock = asyncio.Lock()  # Added lock for synchronization
+        self.lock = asyncio.Lock()
 
     @contextlib.contextmanager
     def collect_http_request(self):
@@ -59,28 +57,21 @@ class MetricsCollector:
         self.total_tokens += count
         self.response_word_bucket[int(time.time())] += count
 
-    async def report_loop(self, time_window=10, flush_interval=20):
-        flush_time = time.time() + flush_interval
+    async def report_loop(self, time_window=10):
         try:
             while True:
                 await asyncio.sleep(time_window)
-                async with self.lock:  # Ensure report and save steps are synchronized
+                async with self.lock:
                     current_time = time.time()
                     report_time = int(current_time - self.start_time)
                     tokens_per_second = self.total_tokens / (current_time - self.start_time)
                     self.time_series.append(report_time)
                     self.tokens_per_second_series.append(tokens_per_second)
                     self.print_report(report_time, tokens_per_second)
-
-                if current_time >= flush_time:
-                    await self.save_to_excel(sheet_name=f'CU_{self.total_requests}', flush=True)
-                    flush_time = current_time + flush_interval
-                    
+                
                 if self.session_time and report_time >= self.session_time:
-                    await self.final_report()  # Ensure final report is called with lock
                     break
         except asyncio.CancelledError:
-            await self.final_report()
             print("Report loop cancelled")
 
     def print_report(self, report_time, tokens_per_second):
@@ -97,70 +88,6 @@ class MetricsCollector:
         print(f"Total Tokens Produced: {self.total_tokens}")
         print()
 
-    async def final_report(self, num_clients):
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-            try:
-                total_duration = time.time() - self.start_time
-                print(f"Final Report for {num_clients} clients: Duration {total_duration} seconds, Tokens {self.total_tokens}, TPS {self.total_tokens / total_duration}")
-                await self.save_to_excel(num_clients, flush=True)
-            finally:
-                self.lock.release()
-        except asyncio.TimeoutError:
-            print("Timeout during final report")
-        except Exception as e:
-            print("Error in final report:", e)
-            if self.lock.locked():
-                self.lock.release()
-
-
-
-
-    async def save_to_excel(self, num_clients, flush=False):
-        sheet_name = f'{num_clients}_CU'
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-
-            os.makedirs("metrics", exist_ok=True)
-            filename = f"metrics/{self.run_name}.xlsx"
-
-            min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
-            data = {
-                'Time (seconds)': self.time_series[:min_length],
-                'Tokens per Second': self.tokens_per_second_series[:min_length],
-                'Latency (seconds)': self.latency_series[:min_length]
-            }
-
-            df = pd.DataFrame(data)
-            with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
-                if sheet_name in writer.book.sheetnames:
-                    writer.book.remove(writer.book[sheet_name])
-                df.to_excel(writer, index=False, sheet_name=sheet_name)
-
-            if flush:
-                self.time_series = self.time_series[min_length:]
-                self.tokens_per_second_series = self.tokens_per_second_series[min_length:]
-                self.latency_series = self.latency_series[min_length:]
-
-        finally:
-            self.lock.release()
-
-
-
-
-    def plot(self):
-        self.plot_series('Tokens per Second', self.tokens_per_second_series, 'Tokens/s')
-        self.plot_series('Response Latency over Time', self.latency_series, 'Latency (s)')
-
-    def plot_series(self, title, series, ylabel):
-        plt.figure(figsize=(10, 5))
-        plt.plot(self.time_series, series, label=ylabel)
-        plt.xlabel('Time (seconds)')
-        plt.ylabel(ylabel)
-        plt.title(title)
-        plt.legend()
-        plt.grid(True)
-        plt.show()
 
 
 class FrameworkHandler:
@@ -170,7 +97,7 @@ class FrameworkHandler:
         self.model = model
         self.token = token
         self.endpoint = endpoint
-        self.use_prompt_field = use_prompt_field  # New flag to use prompt field
+        self.use_prompt_field = use_prompt_field
 
     def get_request_url(self):
         return f"{self.base_url}{self.endpoint}"
@@ -315,8 +242,6 @@ class UserSpawner:
         await asyncio.gather(*self.user_tasks, return_exceptions=True)
         self.user_tasks.clear()
 
-
-
 def count_tokens(text):
     tokens = re.findall(r'\S+', text)
     return len(tokens)
@@ -334,11 +259,9 @@ def load_prompts(file_path, max_tokens=512):
         all_prompts = [json.loads(line) for line in f if line.strip()]
     return filter_prompts(all_prompts, max_tokens)
 
-
-
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
-    prompts = load_prompts('databricks-dolly-15k.jsonl')  
-    handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)  # Pass the flag here
+    prompts = load_prompts('databricks-dolly-15k.jsonl')
+    handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)
     wait_time = await wait_for_service(handler)
     print(f"Service became available after {wait_time} seconds.")
 
@@ -348,7 +271,6 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
         print(f"Ping latency: {ping_latency}")
 
         collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
-        collector.run_name = run_name
 
         async with aiohttp.ClientSession() as session:
             user_spawner = UserSpawner(handler, collector, prompts, target_user_count=num_clients, target_time=time.time() + 20)
@@ -362,18 +284,11 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             if enable_aimd:
                 aimd_task.cancel()
             report_task.cancel()
-            await collector.final_report()
-            await collector.save_to_excel(sheet_name=f'CU_{num_clients}')
-
-
-
-
 
 async def wait_for_service(handler: FrameworkHandler, check_interval=30):
     ping_url = handler.get_request_url()
     ping_data = handler.get_request_data("ping")
     headers = handler.get_headers()
-
 
     headers_curl = " ".join([f'-H "{key}: {value}"' for key, value in headers.items()])
     data_curl = json.dumps(ping_data)
@@ -392,15 +307,12 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
                     if response.status == 200:
                         break
                     else:
-                        #print(response)
                         print(f"Unexpected status {response.status} received from {ping_url}")
         except aiohttp.ClientError as e:
             print(f"HTTP request failed: {e}")
         await asyncio.sleep(check_interval)
     
     return time.time() - start_time
-
-
 
 async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_check=False):
     response_times = []
