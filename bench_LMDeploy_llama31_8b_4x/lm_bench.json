@@ -10,12 +10,11 @@
       "id": "lm-benchmark-llama3.1",
       "args": {
         "cmd": [],
-        "image": "docker.io/k1llahkeezy/llm_bench_v1:latest",
+        "image": "docker.io/k1llahkeezy/llm_bench_v4:latest",
         "gpu": true,
         "expose": 23333,
         "env": {
-          "HF_HOME": "/root/.cache/huggingface/",
-          "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
+          "HF_HOME": "/root/.cache/huggingface/"
         },
         "resources": [
           {

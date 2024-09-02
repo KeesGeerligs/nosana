@@ -1,4 +1,4 @@
-# Provide information about the current directory
+#!/bin/bash
 echo "Current directory: $(pwd)"
 
 # List all files in the current directory
@@ -16,6 +16,4 @@ sleep 30
 echo "Running lm-benchmark..."
 lm-benchmark --url http://localhost:23333 --endpoint /v1/completions --use_prompt_field --job_length 60
 
-# Keep the container running indefinitely
-echo "Benchmark complete, keeping container running..."
-tail -f /dev/null
+kill -TERM 1
