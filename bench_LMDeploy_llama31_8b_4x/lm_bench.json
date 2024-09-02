@@ -10,7 +10,7 @@
       "id": "lm-benchmark-llama3.1",
       "args": {
         "cmd": [],
-        "image": "docker.io/k1llahkeezy/llm_bench:latest",
+        "image": "docker.io/k1llahkeezy/llm_bench_lmdeploy:latest",
         "gpu": true,
         "expose": 23333,
         "env": {
