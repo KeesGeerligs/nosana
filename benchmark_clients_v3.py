@@ -29,7 +29,7 @@ class MetricsCollector:
         self.run_name = "metrics_report"
         self.session_time = session_time
         self.ping_latency = ping_latency
-        self.lock = asyncio.Lock() 
+        self.lock = asyncio.Lock()  # Added lock for synchronization
 
     @contextlib.contextmanager
     def collect_http_request(self):
@@ -63,7 +63,7 @@ class MetricsCollector:
         try:
             while True:
                 await asyncio.sleep(time_window)
-                async with self.lock: 
+                async with self.lock:  # Ensure report and save steps are synchronized
                     current_time = time.time()
                     report_time = int(current_time - self.start_time)
                     tokens_per_second = self.total_tokens / (current_time - self.start_time)
@@ -72,7 +72,7 @@ class MetricsCollector:
                     self.print_report(report_time, tokens_per_second)
                 
                 if self.session_time and report_time >= self.session_time:
-                    await self.final_report() 
+                    await self.final_report()  # Ensure final report is called with lock
                     break
         except asyncio.CancelledError:
             await self.final_report()
@@ -93,7 +93,7 @@ class MetricsCollector:
         print()
 
     async def final_report(self):
-        async with self.lock:  
+        async with self.lock:  # Ensure final report and save steps are synchronized
             total_duration = time.time() - self.start_time
             print("Final Report")
             print(f"Total Duration: {total_duration} seconds")
@@ -103,10 +103,11 @@ class MetricsCollector:
             await self.save_to_excel(sheet_name=f'CU_{self.total_requests}')
 
     async def save_to_excel(self, sheet_name='Metrics'):
-        async with self.lock: 
+        async with self.lock:  # Ensure the save operation is thread-safe
             os.makedirs("metrics", exist_ok=True)
             filename = f"metrics/{self.run_name}.xlsx"
 
+            # Ensure that the time series and other series are of the same length
             min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
             if len(self.time_series) != min_length:
                 print(f"Warning: time_series length adjusted from {len(self.time_series)} to {min_length}.")
@@ -150,7 +151,7 @@ class FrameworkHandler:
         self.model = model
         self.token = token
         self.endpoint = endpoint
-        self.use_prompt_field = use_prompt_field 
+        self.use_prompt_field = use_prompt_field  # New flag to use prompt field
 
     def get_request_url(self):
         return f"{self.base_url}{self.endpoint}"
@@ -318,7 +319,7 @@ def load_prompts(file_path, max_tokens=512):
 
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
-    handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field) 
+    handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)  # Pass the flag here
     wait_time = await wait_for_service(handler)
     print(f"Service became available after {wait_time} seconds.")
 
