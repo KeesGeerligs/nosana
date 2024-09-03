@@ -38,12 +38,13 @@ def generate_framework_cu_plots(model_names):
 
     # Generate plots for each CU
     for cu, frameworks in data.items():
+        cu_number = cu.split('_')[1]  # Split the 'CU_x' string and take the number part
         plt.figure(figsize=(12, 8))
         for key, dfs in frameworks.items():
             for df in dfs:
                 plt.plot(df['Time (seconds)'], df['Tokens per Second'], label=key)
 
-        plt.title(f'Llama 3.1 8B total tokens per Second - {cu} Comparison')
+        plt.title(f'Llama 3.1 8B')
         plt.xlabel('Time (seconds)')
         plt.ylabel('Tokens per Second')
         plt.legend(title="Framework & GPU")
@@ -54,8 +55,9 @@ def generate_framework_cu_plots(model_names):
         plt.close()
         print(f"Plot saved: {output_filepath}")
 
-    if not any(frameworks for frameworks in data.values()):
-        print("No data to plot.")
+
+        if not any(frameworks for frameworks in data.values()):
+            print("No data to plot.")
 
 def main():
     parser = argparse.ArgumentParser(description='Generate performance comparison plots for each CU level across multiple GPUs and frameworks.')

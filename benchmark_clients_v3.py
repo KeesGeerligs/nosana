@@ -59,8 +59,7 @@ class MetricsCollector:
         self.total_tokens += count
         self.response_word_bucket[int(time.time())] += count
 
-    async def report_loop(self, time_window=10, flush_interval=20):
-        flush_time = time.time() + flush_interval
+    async def report_loop(self, time_window=10):
         try:
             while True:
                 await asyncio.sleep(time_window)
@@ -71,11 +70,7 @@ class MetricsCollector:
                     self.time_series.append(report_time)
                     self.tokens_per_second_series.append(tokens_per_second)
                     self.print_report(report_time, tokens_per_second)
-
-                if current_time >= flush_time:
-                    await self.save_to_excel(sheet_name=f'CU_{self.total_requests}', flush=True)
-                    flush_time = current_time + flush_interval
-                    
+                
                 if self.session_time and report_time >= self.session_time:
                     await self.final_report()  # Ensure final report is called with lock
                     break
@@ -97,34 +92,30 @@ class MetricsCollector:
         print(f"Total Tokens Produced: {self.total_tokens}")
         print()
 
-    async def final_report(self, num_clients):
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-            try:
-                total_duration = time.time() - self.start_time
-                print(f"Final Report for {num_clients} clients: Duration {total_duration} seconds, Tokens {self.total_tokens}, TPS {self.total_tokens / total_duration}")
-                await self.save_to_excel(num_clients, flush=True)
-            finally:
-                self.lock.release()
-        except asyncio.TimeoutError:
-            print("Timeout during final report")
-        except Exception as e:
-            print("Error in final report:", e)
-            if self.lock.locked():
-                self.lock.release()
+    async def final_report(self):
+        async with self.lock:  # Ensure final report and save steps are synchronized
+            total_duration = time.time() - self.start_time
+            print("Final Report")
+            print(f"Total Duration: {total_duration} seconds")
+            print(f"Total Tokens Produced: {self.total_tokens}")
+            print(f"Total Tokens per Second: {self.total_tokens / total_duration}")
+            print(f"Total Requests Made: {self.total_requests}")
+            await self.save_to_excel(sheet_name=f'CU_{self.total_requests}')
 
-
-
-
-    async def save_to_excel(self, num_clients, flush=False):
-        sheet_name = f'{num_clients}_CU'
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-
+    async def save_to_excel(self, sheet_name='Metrics'):
+        async with self.lock:  # Ensure the save operation is thread-safe
             os.makedirs("metrics", exist_ok=True)
             filename = f"metrics/{self.run_name}.xlsx"
 
+            # Ensure that the time series and other series are of the same length
             min_length = min(len(self.time_series), len(self.tokens_per_second_series), len(self.latency_series))
+            if len(self.time_series) != min_length:
+                print(f"Warning: time_series length adjusted from {len(self.time_series)} to {min_length}.")
+            if len(self.tokens_per_second_series) != min_length:
+                print(f"Warning: tokens_per_second_series length adjusted from {len(self.tokens_per_second_series)} to {min_length}.")
+            if len(self.latency_series) != min_length:
+                print(f"Warning: latency_series length adjusted from {len(self.latency_series)} to {min_length}.")
+
             data = {
                 'Time (seconds)': self.time_series[:min_length],
                 'Tokens per Second': self.tokens_per_second_series[:min_length],
@@ -134,33 +125,11 @@ class MetricsCollector:
             df = pd.DataFrame(data)
             with pd.ExcelWriter(filename, engine='openpyxl', mode='a' if os.path.exists(filename) else 'w') as writer:
                 if sheet_name in writer.book.sheetnames:
-                    writer.book.remove(writer.book[sheet_name])
+                    del writer.book[sheet_name]
                 df.to_excel(writer, index=False, sheet_name=sheet_name)
-
-            if flush:
-                self.time_series = self.time_series[min_length:]
-                self.tokens_per_second_series = self.tokens_per_second_series[min_length:]
-                self.latency_series = self.latency_series[min_length:]
-
-        finally:
-            self.lock.release()
+            print(f"Metrics saved to {filename}")
 
 
-
-
-    def plot(self):
-        self.plot_series('Tokens per Second', self.tokens_per_second_series, 'Tokens/s')
-        self.plot_series('Response Latency over Time', self.latency_series, 'Latency (s)')
-
-    def plot_series(self, title, series, ylabel):
-        plt.figure(figsize=(10, 5))
-        plt.plot(self.time_series, series, label=ylabel)
-        plt.xlabel('Time (seconds)')
-        plt.ylabel(ylabel)
-        plt.title(title)
-        plt.legend()
-        plt.grid(True)
-        plt.show()
 
 
 class FrameworkHandler:
@@ -362,8 +331,8 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
             if enable_aimd:
                 aimd_task.cancel()
             report_task.cancel()
-            await collector.final_report()
-            await collector.save_to_excel(sheet_name=f'CU_{num_clients}')
+            collector.final_report()
+            collector.save_to_excel(sheet_name=f'CU_{num_clients}')
 
 
 
