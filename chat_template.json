@@ -1,0 +1,13 @@
+{
+    "model_name": "int",
+    "system": "<|start_header_id|>system<|end_header_id|>\n\n",
+    "meta_instruction": "A chat between a user and an assistant.",
+    "eosys": "<|eot_id|>",
+    "user": "<|start_header_id|>user<|end_header_id|>\n\n",
+    "eoh": "<|eot_id|>",
+    "assistant": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+    "eoa": "<|eot_id|>",
+    "separator": "\n\n",
+    "capability": "chat",
+    "stop_words": ["<|eot_id|>"]
+}
