@@ -11,7 +11,7 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "for i in `seq 1 3`; do echo 'Starting lmdeploy service...'; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --model-format awq & sleep 30; echo 'Running lm-benchmark...'; lm-benchmark --url http://localhost:23333 --endpoint /v1/completions --use_prompt_field --job_length 300; sleep 1; done"
+          "for i in `seq 1 3`; do echo 'Starting lmdeploy service...'; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --model-format awq & sleep 30; echo 'Running lm-benchmark...'; lm-benchmark --url http://localhost:23333 --endpoint /v1/completions --use_prompt_field --job_length 20; sleep 1; done; kill -TERM 1"
         ],
         "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.1",
         "gpu": true,
