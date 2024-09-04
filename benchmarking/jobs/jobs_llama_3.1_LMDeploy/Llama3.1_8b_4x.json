@@ -21,7 +21,7 @@
             "--model-format",
             "awq"
           ],
-          "image": "docker.io/openmmlab/lmdeploy:v0.5.3-cu12",
+          "image": "docker.io/openmmlab/lmdeploy:v0.6.0a0-cu12",
           "gpu": true,
           "expose": 23333,
           "resources": [
