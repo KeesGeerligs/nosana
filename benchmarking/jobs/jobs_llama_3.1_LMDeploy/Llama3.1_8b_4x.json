@@ -18,10 +18,12 @@
             "../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91",
             "--model-name",
             "llama3.1",
+            "--chat-template",
+            "/chat_template.json",
             "--model-format",
             "awq"
           ],
-          "image": "docker.io/openmmlab/lmdeploy:v0.6.0a0-cu12",
+          "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.3",
           "gpu": true,
           "expose": 23333,
           "resources": [
