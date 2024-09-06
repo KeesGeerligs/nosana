@@ -21,9 +21,7 @@
             "--chat-template",
             "/chat_template.json",
             "--model-format",
-            "awq",
-            "--log-level",
-            "ERROR"
+            "awq"
           ],
           "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.3",
           "gpu": true,

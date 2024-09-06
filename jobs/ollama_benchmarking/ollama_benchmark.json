@@ -1,0 +1,38 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "llm_benchmarks",
+        "args": {
+          "cmd": [
+            "100",
+            "10",
+            "1"
+          ],
+          "image": "registry.hub.docker.com/nosana/llm_benchmark:1.0.0",
+          "env": {
+            "CUDA_VISIBLE_DEVICES": "0",
+            "OLLAMA_NUM_PARALLEL": "1"
+          },
+          "gpu": true,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "s3://nos-ai-models-qllsn32u/ollama/llama3.1/8b",
+              "target": "/root/.ollama/models"
+            }
+          ]
+        },
+        "results": {
+          "llama3.1_results": "(?<=Results for llama3.1: ).*",
+          "system_specs": "(?<=system specs: ).*"
+        }
+      }
+    ]
+  }
+  
