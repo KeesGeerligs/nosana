@@ -12,7 +12,8 @@ setup(
         "openpyxl",
         "typer",
         "speedtest-cli",
-        "GPUtil"
+        "GPUtil",
+        "psycopg2"
     ],
     entry_points={
         "console_scripts": [
