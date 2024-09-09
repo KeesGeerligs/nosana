@@ -26,8 +26,7 @@ def connect_to_db(): #test
             database=os.getenv('DB_NAME'),
             user=os.getenv('DB_USER'),
             password=os.getenv('DB_PASSWORD'),
-            port=os.getenv('DB_PORT'),
-            sslmode='require'  # Ensure SSL connection for security
+            port=os.getenv('DB_PORT')
         )
         return conn
     except psycopg2.Error as e:

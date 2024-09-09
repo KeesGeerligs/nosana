@@ -4,10 +4,10 @@ import json
 from psycopg2 import sql
 
 # Set environment variables for testing
-os.environ['DB_HOST'] = "dbtestrun.cluster-cpsu6measava.eu-west-2.rds.amazonaws.com"
-os.environ['DB_NAME'] = "DBtestrun"
-os.environ['DB_USER'] = "DBtestrun"
-os.environ['DB_PASSWORD'] = "DBtestrun"
+os.environ['DB_HOST'] = "dbtestrun.cpsu6measava.eu-west-2.rds.amazonaws.com"
+os.environ['DB_NAME'] = "dbtestrun"
+os.environ['DB_USER'] = "dbtestrun"
+os.environ['DB_PASSWORD'] = "dbtestrun"
 os.environ['DB_PORT'] = "5432"
 
 def connect_to_db():

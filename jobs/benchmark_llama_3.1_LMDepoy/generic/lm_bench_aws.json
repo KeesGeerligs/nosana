@@ -19,9 +19,9 @@
         "env": {
           "HF_HOME": "/root/.cache/huggingface/",
           "TRANSFORMERS_CACHE": "/root/.cache/huggingface/",
-          "DB_HOST": "dbtestrun.cluster-cpsu6measava.eu-west-2.rds.amazonaws.com",
-          "DB_NAME": "DBtestrun",
-          "DB_USER": "DBtestrun",
+          "DB_HOST": "dbtestrun.cpsu6measava.eu-west-2.rds.amazonaws.com",
+          "DB_NAME": "dbtestrun",
+          "DB_USER": "dbtestrun",
           "DB_PASSWORD": "dbtestrun",
           "DB_PORT": "5432"
         },
