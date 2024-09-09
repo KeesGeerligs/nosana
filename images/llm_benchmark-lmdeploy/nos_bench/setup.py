@@ -13,7 +13,7 @@ setup(
         "typer",
         "speedtest-cli",
         "GPUtil",
-        "psycopg2"
+        "psycopg2-binary"
     ],
     entry_points={
         "console_scripts": [
