@@ -47,7 +47,7 @@ def generate_framework_cu_plots(model_names):
         plt.title(f'Llama 3.1 8B')
         plt.xlabel('Time (seconds)')
         plt.ylabel('Tokens per Second')
-        plt.legend(title="Framework & GPU")
+        plt.legend(title="Framework & GPU", loc='upper left')
         plt.grid(True)
 
         output_filepath = os.path.join(output_directory, f'{cu}_comparison.png')

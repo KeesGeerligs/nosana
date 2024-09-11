@@ -19,7 +19,7 @@
             "--model-name",
             "llama3.1"
           ],
-          "image": "docker.io/openmmlab/lmdeploy:v0.5.3-cu12",
+          "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.3",
           "gpu": true,
           "expose": 23333,
           "resources": [
