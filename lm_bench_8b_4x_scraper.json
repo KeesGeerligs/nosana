@@ -11,9 +11,9 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --ping_correction --job_length 50"
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --ping_correction --job_length 10"
         ],
-        "image": "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.1",
+        "image": "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.3",
         "gpu": true,
         "expose": 23333,
         "env": {
@@ -27,16 +27,14 @@
             "target": "/root/"
           }
         ]},
-        "results": {
-          "results_CU_100": "Running benchmark for model llama3.1 with 100 CU\\s*({.*?}\\s*\n)",
-          "results_CU_50": "Running benchmark for model llama3.1 with 50 CU\\s*({.*?}\\s*\n)",
-          "results_CU_10": "Running benchmark for model llama3.1 with 10 CU\\s*({.*?}\\s*\n)",
-          "results_CU_5": "Running benchmark for model llama3.1 with 5 CU\\s*({.*?}\\s*\n)",
-          "results_CU_1": "Running benchmark for model llama3.1 with 1 CU\\s*({.*?}\\s*\n)",
+        "results":{
+          "results_CU_100": "(?<=100 CU: ).*",
+          "results_CU_50": "(?<=50 CU: ).*",
+          "results_CU_10": "(?<=10 CU: ).*",
+          "results_CU_5": "(?<=5 CU: ).*",
+          "results_CU_1": "(?<=1 CU: ).*",
           "system_specs": "(?<=system specs: ).*"
-
-      
-      }
+        } 
     }
   ]
 }

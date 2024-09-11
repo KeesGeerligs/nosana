@@ -1,5 +1,10 @@
 export function extractSystemSpecs(system_specs, jobResult) {
-  // Assuming systemSpecs is an array of strings
+  // Check if system_specs is defined and not empty
+  if (!system_specs || system_specs.length === 0) {
+    console.error("System specs are undefined or empty.");
+    return;
+  }
+
   const specString = system_specs[0];
   try {
     // Replace single quotes with double quotes for valid JSON

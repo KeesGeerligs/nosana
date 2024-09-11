@@ -1,0 +1,473 @@
+{
+  "resources": {
+    "images": {
+      "registry.hub.docker.com/nosana/frpc:0.1.0": {
+        "required": false,
+        "lastUsed": "2024-09-11T08:27:14.684Z",
+        "usage": 20
+      },
+      "registry.hub.docker.com/nosana/tunnel:0.1.0": {
+        "required": false,
+        "lastUsed": "2024-09-10T13:40:41.547Z",
+        "usage": 9
+      },
+      "registry.hub.docker.com/nosana/stats:v1.0.4": {
+        "required": true,
+        "lastUsed": "2024-09-11T08:05:52.416Z",
+        "usage": 19
+      },
+      "registry.hub.docker.com/nosana/llm_benchmark:1.0.0": {
+        "required": true,
+        "lastUsed": "2024-09-10T13:40:58.470Z",
+        "usage": 2
+      },
+      "registry.hub.docker.com/nosana/remote-resource-helper:0.1.0": {
+        "required": true,
+        "lastUsed": "2024-09-10T07:06:01.821Z",
+        "usage": 1
+      },
+      "docker.io/openmmlab/lmdeploy:v0.5.3-cu12": {
+        "required": true,
+        "lastUsed": "2024-09-10T07:08:17.238Z",
+        "usage": 1
+      },
+      "docker.io/vllm/vllm-openai:v0.5.4": {
+        "required": true,
+        "lastUsed": "2024-09-10T07:10:05.858Z",
+        "usage": 1
+      },
+      "docker.io/tensorflow/tensorflow:2.17.0-gpu-jupyter": {
+        "required": true,
+        "lastUsed": "2024-09-10T07:11:26.980Z",
+        "usage": 1
+      },
+      "docker.io/saladtechnologies/a1111:ipv6-v1.9.4": {
+        "required": true,
+        "lastUsed": "2024-09-10T07:13:09.236Z",
+        "usage": 1
+      },
+      "registry.hub.docker.com/nosana/remote-resource-helper:0.3.0": {
+        "required": false,
+        "lastUsed": "2024-09-11T08:27:14.699Z",
+        "usage": 13
+      },
+      "docker.io/nosana/llm_benchmark-lmdeploy:0.0.3": {
+        "required": false,
+        "lastUsed": "2024-09-11T06:04:48.387Z",
+        "usage": 7
+      },
+      "docker.io/keesgeerligs/llm_benchmark-lmdeploy_aws:0.0.2": {
+        "required": false,
+        "lastUsed": "2024-09-10T10:27:32.006Z",
+        "usage": 2
+      },
+      "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.2": {
+        "required": false,
+        "lastUsed": "2024-09-11T08:16:15.555Z",
+        "usage": 1
+      },
+      "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.3": {
+        "required": false,
+        "lastUsed": "2024-09-11T08:27:14.669Z",
+        "usage": 1
+      }
+    },
+    "volumes": {
+      "s3://nos-ai-models-qllsn32u/stable-diffusion/dreamshaper/8": {
+        "volume": "047aca2136fa57f995b3cc0759cde30f7b11e794390910fad23e22330dc67fd5",
+        "required": true,
+        "lastUsed": "2024-09-10T07:14:20.228Z",
+        "usage": 1
+      },
+      "s3://nos-ai-models-qllsn32u/stable-diffusion/2dPixelSprites": {
+        "volume": "26e1bc6cab4c3a04918cd61a7cc94ebffbc8076b3c19902dfb714881ab24c313",
+        "required": true,
+        "lastUsed": "2024-09-10T07:16:00.366Z",
+        "usage": 1
+      },
+      "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B": {
+        "volume": "7cd4e837b029ba784e511b7d0b40d42229c4013ec944c716db01a15505520a48",
+        "required": false,
+        "lastUsed": "2024-09-10T12:26:45.030Z",
+        "usage": 5
+      },
+      "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4": {
+        "volume": "22b441de28931867b8a3844805911657fdfab9f4f9763f8b21ac32c03f9708f3",
+        "required": false,
+        "lastUsed": "2024-09-11T08:27:14.703Z",
+        "usage": 8
+      },
+      "s3://nos-ai-models-qllsn32u/ollama/llama3.1/8b": {
+        "volume": "88a04cff8fb027e7220ee03698770dc1bbfd0ba997c3eb751a2d4d852c418320",
+        "required": false,
+        "lastUsed": "2024-09-10T13:43:52.083Z",
+        "usage": 1
+      }
+    }
+  },
+  "flows": {
+    "pj31ngbtnwblmwvk3svsz8i9ngumz0mg": {
+      "id": "pj31ngbtnwblmwvk3svsz8i9ngumz0mg",
+      "jobDefinition": {
+        "version": "0.1",
+        "type": "container",
+        "meta": {
+          "trigger": "cli"
+        },
+        "ops": [
+          {
+            "type": "container/run",
+            "id": "lm-benchmark-llama3.1",
+            "args": {
+              "cmd": [
+                "/bin/sh",
+                "-c",
+                "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --ping_correction --job_length 10"
+              ],
+              "image": "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.3",
+              "gpu": true,
+              "expose": 23333,
+              "env": {
+                "HF_HOME": "/root/.cache/huggingface/",
+                "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
+              },
+              "resources": [
+                {
+                  "type": "S3",
+                  "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+                  "target": "/root/"
+                }
+              ]
+            },
+            "results": {
+              "results_CU_100": "(?<=100 CU: ).*",
+              "results_CU_50": "(?<=50 CU: ).*",
+              "results_CU_10": "(?<=10 CU: ).*",
+              "results_CU_5": "(?<=5 CU: ).*",
+              "results_CU_1": "(?<=1 CU: ).*",
+              "system_specs": "(?<=system specs: ).*"
+            }
+          }
+        ]
+      },
+      "state": {
+        "status": "success",
+        "startTime": 1726043232884,
+        "endTime": 1726043371116,
+        "opStates": [
+          {
+            "operationId": "lm-benchmark-llama3.1",
+            "providerId": "0d2222b5589a7c21932604884dbc574bad390363524cc8e96d389a093198bcc6",
+            "status": "success",
+            "startTime": 1726043232998,
+            "endTime": 1726043369649,
+            "exitCode": 0,
+            "logs": [
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "==========\n"
+              },
+              {
+                "type": "stdout",
+                "log": "== CUDA ==\n"
+              },
+              {
+                "type": "stdout",
+                "log": "==========\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "CUDA Version 12.4.1\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "This container image and its contents are governed by the NVIDIA Deep Learning Container License.\n"
+              },
+              {
+                "type": "stdout",
+                "log": "By pulling and using the container, you accept the terms and conditions of this license:\n"
+              },
+              {
+                "type": "stdout",
+                "log": "https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Starting lmdeploy service...\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  warnings.warn(\n"
+              },
+              {
+                "type": "stderr",
+                "log": "There was a problem when trying to write in your cache folder (/root/.cache/huggingface/). You should set the environment variable TRANSFORMERS_CACHE to a writable directory.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "\rConvert to turbomind format:   0%|          | 0/32 [00:00<?, ?it/s]\rConvert to turbomind format:   3%|▎         | 1/32 [00:00<00:22,  1.41it/s]\rConvert to turbomind format:   9%|▉         | 3/32 [00:00<00:06,  4.22it/s]\rConvert to turbomind format:  16%|█▌        | 5/32 [00:00<00:04,  6.59it/s]\rConvert to turbomind format:  22%|██▏       | 7/32 [00:01<00:02,  8.54it/s]\rConvert to turbomind format:  28%|██▊       | 9/32 [00:01<00:02, 10.01it/s]\rConvert to turbomind format:  34%|███▍      | 11/32 [00:01<00:01, 11.03it/s]\rConvert to turbomind format:  41%|████      | 13/32 [00:01<00:01, 11.80it/s]\rConvert to turbomind format:  47%|████▋     | 15/32 [00:01<00:01, 12.36it/s]\rConvert to turbomind format:  53%|█████▎    | 17/32 [00:01<00:01, 12.79it/s]\rConvert to turbomind format:  59%|█████▉    | 19/32 [00:02<00:00, 13.11it/s]\rConvert to turbomind format:  66%|██████▌   | 21/32 [00:02<00:00, 13.34it/s]\rConvert to turbomind format:  72%|███████▏  | 23/32 [00:02<00:00, 13.46it/s]\rConvert to turbomind format:  78%|███████▊  | 25/32 [00:02<00:00, 13.58it/s]\rConvert to turbomind format:  84%|████████▍ | 27/32 [00:02<00:00, 13.67it/s]\rConvert to turbomind format:  91%|█████████ | 29/32 [00:02<00:00, 13.59it/s]\rConvert to turbomind format:  97%|█████████▋| 31/32 [00:02<00:00, 13.37it/s]\r                                                                            \rINFO:     Started server process [38]\n"
+              },
+              {
+                "type": "stderr",
+                "log": "INFO:     Waiting for application startup.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "INFO:     Application startup complete.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "INFO:     Uvicorn running on http://0.0.0.0:23333 (Press CTRL+C to quit)\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running lm-benchmark...\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  return _methods._mean(a, axis=axis, dtype=dtype,\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  ret = ret.dtype.type(ret / rcount)\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  return _methods._mean(a, axis=axis, dtype=dtype,\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  ret = ret.dtype.type(ret / rcount)\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  return _methods._mean(a, axis=axis, dtype=dtype,\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  ret = ret.dtype.type(ret / rcount)\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  return _methods._mean(a, axis=axis, dtype=dtype,\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  ret = ret.dtype.type(ret / rcount)\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  return _methods._mean(a, axis=axis, dtype=dtype,\n"
+              },
+              {
+                "type": "stderr",
+                "log": "/opt/py3/lib/python3.10/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n"
+              },
+              {
+                "type": "stderr",
+                "log": "  ret = ret.dtype.type(ret / rcount)\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Starting to retrieve system configurations...\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Starting internet speed test...\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Download Speed: 634.27 Mbps\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Upload Speed: 180.09 Mbps\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Internet speed test duration: 42.43 seconds\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "system specs: {'system': 'Linux', 'memory_GB': 31.22, 'cpu': 'Intel(R) Core(TM) i9-14900K', 'os_version': 'Ubuntu 22.04.4 LTS', 'cpu_info': {'processor': 'x86_64', 'physical_cores': 16, 'logical_cores': 32}, 'memory_info': {'total_memory_GB': 31.22, 'available_memory_GB': 28.83, 'used_memory_GB': 1.78, 'memory_utilization': 7.6}, 'disk_info': {'total_disk_space_GB': 1006.85, 'used_disk_space_GB': 94.15, 'free_disk_space_GB': 861.49, 'disk_space_utilization': 9.9}, 'gpu_info': {'0': 'there_is_gpu', '1': {'id': 0, 'name': 'NVIDIA GeForce RTX 4090', 'driver': '560.94', 'gpu_memory_total_MB': 24564.0, 'gpu_memory_free_MB': 2007.0, 'gpu_memory_used_MB': 22136.0, 'gpu_load_percent': 0.0, 'gpu_temperature_C': 51.0}}, 'download_speed': 634.27, 'upload_speed': 180.09}\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Starting benchmark service...\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Testing latency...\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Ping latency: 0.0028 seconds\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running benchmark for model llama3.1 with 100 CU\n"
+              },
+              {
+                "type": "stdout",
+                "log": "100 CU: {\"total_duration\": 11.29, \"total_tokens_produced\": 13698, \"average_tokens_per_second\": 1212.81, \"total_requests_made\": 237, \"status_distribution\": {\"200\": 137}, \"average_latency\": 4.41, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running benchmark for model llama3.1 with 50 CU\n"
+              },
+              {
+                "type": "stdout",
+                "log": "50 CU: {\"total_duration\": 11.28, \"total_tokens_produced\": 17978, \"average_tokens_per_second\": 1594.31, \"total_requests_made\": 188, \"status_distribution\": {\"200\": 139}, \"average_latency\": 2.85, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running benchmark for model llama3.1 with 10 CU\n"
+              },
+              {
+                "type": "stdout",
+                "log": "10 CU: {\"total_duration\": 11.24, \"total_tokens_produced\": 8888, \"average_tokens_per_second\": 790.5, \"total_requests_made\": 67, \"status_distribution\": {\"200\": 57}, \"average_latency\": 1.63, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running benchmark for model llama3.1 with 5 CU\n"
+              },
+              {
+                "type": "stdout",
+                "log": "5 CU: {\"total_duration\": 11.29, \"total_tokens_produced\": 5504, \"average_tokens_per_second\": 487.48, \"total_requests_made\": 40, \"status_distribution\": {\"200\": 35}, \"average_latency\": 1.37, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}\n"
+              },
+              {
+                "type": "stdout",
+                "log": "\n"
+              },
+              {
+                "type": "stdout",
+                "log": "Running benchmark for model llama3.1 with 1 CU\n"
+              },
+              {
+                "type": "stdout",
+                "log": "1 CU: {\"total_duration\": 11.28, \"total_tokens_produced\": 1354, \"average_tokens_per_second\": 120.06, \"total_requests_made\": 9, \"status_distribution\": {\"200\": 8}, \"average_latency\": 1.21, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}\n"
+              }
+            ],
+            "results": {
+              "results_CU_100": [
+                "{\"total_duration\": 11.29, \"total_tokens_produced\": 13698, \"average_tokens_per_second\": 1212.81, \"total_requests_made\": 237, \"status_distribution\": {\"200\": 137}, \"average_latency\": 4.41, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}"
+              ],
+              "results_CU_50": [
+                "{\"total_duration\": 11.28, \"total_tokens_produced\": 17978, \"average_tokens_per_second\": 1594.31, \"total_requests_made\": 188, \"status_distribution\": {\"200\": 139}, \"average_latency\": 2.85, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}"
+              ],
+              "results_CU_10": [
+                "{\"total_duration\": 11.24, \"total_tokens_produced\": 8888, \"average_tokens_per_second\": 790.5, \"total_requests_made\": 67, \"status_distribution\": {\"200\": 57}, \"average_latency\": 1.63, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}"
+              ],
+              "results_CU_5": [
+                "{\"total_duration\": 11.29, \"total_tokens_produced\": 5504, \"average_tokens_per_second\": 487.48, \"total_requests_made\": 40, \"status_distribution\": {\"200\": 35}, \"average_latency\": 1.37, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}"
+              ],
+              "results_CU_1": [
+                "{\"total_duration\": 11.28, \"total_tokens_produced\": 1354, \"average_tokens_per_second\": 120.06, \"total_requests_made\": 9, \"status_distribution\": {\"200\": 8}, \"average_latency\": 1.21, \"gpu_0_clock_speed\": NaN, \"gpu_0_power_usage\": NaN, \"gpu_0_utilization\": NaN}"
+              ],
+              "system_specs": [
+                "{'system': 'Linux', 'memory_GB': 31.22, 'cpu': 'Intel(R) Core(TM) i9-14900K', 'os_version': 'Ubuntu 22.04.4 LTS', 'cpu_info': {'processor': 'x86_64', 'physical_cores': 16, 'logical_cores': 32}, 'memory_info': {'total_memory_GB': 31.22, 'available_memory_GB': 28.83, 'used_memory_GB': 1.78, 'memory_utilization': 7.6}, 'disk_info': {'total_disk_space_GB': 1006.85, 'used_disk_space_GB': 94.15, 'free_disk_space_GB': 861.49, 'disk_space_utilization': 9.9}, 'gpu_info': {'0': 'there_is_gpu', '1': {'id': 0, 'name': 'NVIDIA GeForce RTX 4090', 'driver': '560.94', 'gpu_memory_total_MB': 24564.0, 'gpu_memory_free_MB': 2007.0, 'gpu_memory_used_MB': 22136.0, 'gpu_load_percent': 0.0, 'gpu_temperature_C': 51.0}}, 'download_speed': 634.27, 'upload_speed': 180.09}"
+              ]
+            }
+          }
+        ],
+        "secrets": {}
+      }
+    }
+  }
+}

@@ -175,8 +175,7 @@ class MetricsCollector:
         self.gpu_monitor.stop_monitoring.set() 
         if hasattr(self.gpu_monitor, 'monitoring_thread'):
             self.gpu_monitor.monitoring_thread.join()
-    
-    def final_report(self):
+    def final_report(self, num_clients):
         total_duration = time.time() - self.start_time
         average_tokens_per_second = self.total_tokens / total_duration
         
@@ -192,9 +191,10 @@ class MetricsCollector:
             **self.gpu_stats  # Spread the flat GPU stats into the report
         }
         
-        print(json.dumps(report, indent=2))
+        print(f"{num_clients} CU: {json.dumps(report)}")
 
         return report
+
 
     
 
@@ -439,7 +439,7 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
                 aimd_task.cancel()
             report_task.cancel()
             collector.stop_gpu_monitoring()
-            collector.final_report()
+            collector.final_report(num_clients)
 
 def main():
     parser = argparse.ArgumentParser(description='Run benchmark on an API')
