@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import argparse
 
 def generate_framework_cu_plots(model_names):
-    directories = [os.path.join('metrics', model_name) for model_name in model_names]
-    output_directory = os.path.join('plots', '_vs_'.join(model_names))
+    directories = [os.path.join('C:\\Users\\User\\OneDrive\\Documenten\\GitHub\\nosana\\benchmarking\\metrics', model_name) for model_name in model_names]
+    output_directory = os.path.join('C:\\Users\\User\\OneDrive\\Documenten\\GitHub\\nosana\\plotting\\plots', '_vs_'.join(model_names))
     os.makedirs(output_directory, exist_ok=True)
 
     # Predefined CU levels

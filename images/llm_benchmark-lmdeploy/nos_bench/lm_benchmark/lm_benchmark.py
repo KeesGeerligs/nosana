@@ -14,12 +14,12 @@ import re
 import subprocess
 import threading 
 from .sysmain import get_extra
-from datetime import datetime #test
+from datetime import datetime 
 import psycopg2
 from psycopg2 import sql
 
-def connect_to_db(): #test
-    # Connect to the PostgreSQL database
+def connect_to_db():
+
     try:
         conn = psycopg2.connect(
             host=os.getenv('DB_HOST'),
@@ -114,10 +114,10 @@ class GPUMonitor:
                         'power_usage': gpu['power_usage'],
                         'utilization': gpu['utilization']
                     })
-                time.sleep(1)  # Collect data every second
+                time.sleep(1) 
             except Exception as e:
                 print(f"Error in GPU monitoring thread: {e}")
-                time.sleep(1)  # Wait a bit before trying again
+                time.sleep(1) 
 
     def get_gpu_stats(self, start_time, end_time):
         start_time_dt = datetime.fromtimestamp(start_time)
@@ -216,9 +216,9 @@ class MetricsCollector:
         self.gpu_monitor.start_monitoring()
 
     def stop_gpu_monitoring(self):
-        self.gpu_monitor.stop_monitoring.set()  # Set the Event to stop monitoring
+        self.gpu_monitor.stop_monitoring.set() 
         if hasattr(self.gpu_monitor, 'monitoring_thread'):
-            self.gpu_monitor.monitoring_thread.join()  # Wait for the monitoring thread to finish
+            self.gpu_monitor.monitoring_thread.join()
 
     def final_report(self):
         total_duration = time.time() - self.start_time
@@ -499,7 +499,6 @@ def main():
     parser.add_argument('--use_prompt_field', action='store_true', help='Use the prompt field instead of messages')
     args = parser.parse_args()
 
-    # Get the system specs before the benchmarking
     sys_info = get_extra()
     print(f"system specs: {sys_info['specs']}\n")
 
