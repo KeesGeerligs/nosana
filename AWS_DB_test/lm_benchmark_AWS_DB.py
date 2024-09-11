@@ -13,11 +13,55 @@ import math
 import re
 import subprocess
 import threading 
-from .sysmain import get_extra
+from .sysmain import get_extra # type: ignore
 from datetime import datetime 
 import psycopg2
 from psycopg2 import sql
 
+def connect_to_db():
+
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
+        )
+        return conn
+    except psycopg2.Error as e:
+        print(f"Error connecting to database: {e}")
+        return None
+
+def send_report_to_db(report):
+    conn = connect_to_db()
+    if conn:
+        try:
+            with conn.cursor() as cursor:
+                insert_query = sql.SQL("""
+                    INSERT INTO benchmark_reports (
+                        total_duration, total_tokens_produced, avg_tokens_per_sec,
+                        total_requests, status_distribution, avg_latency, gpu_stats, report_time
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+                """)
+
+                cursor.execute(insert_query, [
+                    report["total_duration"],
+                    report["total_tokens_produced"],
+                    report["average_tokens_per_second"],
+                    report["total_requests_made"],
+                    json.dumps(report["status_distribution"]),
+                    report["average_latency"],
+                    json.dumps(report["gpu_stats"])
+                ])
+                conn.commit()
+                print("Report sent to database successfully.")
+        except psycopg2.Error as e:
+            print(f"Error sending report to database: {e}")
+        finally:
+            conn.close()
+    else:
+        print("Failed to connect to the database.")
 
 
 def get_gpu_info():
@@ -193,7 +237,7 @@ class MetricsCollector:
         }
         
         print(json.dumps(report, indent=2))
-
+        send_report_to_db(report)
         return report
 
     

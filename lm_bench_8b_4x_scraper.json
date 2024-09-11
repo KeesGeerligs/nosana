@@ -1,0 +1,42 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "lm-benchmark-llama3.1",
+      "args": {
+        "cmd": [
+          "/bin/sh", "-c", 
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1 --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --ping_correction --job_length 50"
+        ],
+        "image": "docker.io/keesgeerligs/llm_benchmark-lmdeploy_scrap:0.0.1",
+        "gpu": true,
+        "expose": 23333,
+        "env": {
+          "HF_HOME": "/root/.cache/huggingface/",
+          "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
+        },
+        "resources": [
+          {
+            "type": "S3",
+            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/"
+          }
+        ]},
+        "results": {
+          "results_CU_100": "Running benchmark for model llama3.1 with 100 CU\\s*({.*?}\\s*\n)",
+          "results_CU_50": "Running benchmark for model llama3.1 with 50 CU\\s*({.*?}\\s*\n)",
+          "results_CU_10": "Running benchmark for model llama3.1 with 10 CU\\s*({.*?}\\s*\n)",
+          "results_CU_5": "Running benchmark for model llama3.1 with 5 CU\\s*({.*?}\\s*\n)",
+          "results_CU_1": "Running benchmark for model llama3.1 with 1 CU\\s*({.*?}\\s*\n)",
+          "system_specs": "(?<=system specs: ).*"
+
+      
+      }
+    }
+  ]
+}
