@@ -15,6 +15,8 @@ import subprocess
 import threading 
 from .sysmain import get_extra
 from datetime import datetime 
+import aiohttp
+
 
 def get_gpu_info():
     """Retrieve GPU clock speed, power usage, and utilization for all GPUs."""
@@ -94,14 +96,16 @@ class GPUMonitor:
 
     
 class MetricsCollector:
-    def __init__(self, model_name, session_time=None, ping_latency=0.0):
+    def __init__(self, model_name, session_time=None, ping_latency=0.0, nosana_price=None):
         self.model_name = model_name 
         self.start_time = time.time()
         self.response_word_bucket = defaultdict(int)
         self.response_latency_bucket = defaultdict(list)
+        self.total_input_tokens = 0
         self.on_going_requests = 0
         self.total_requests = 0
         self.on_going_users = 0
+        self.nosana_price = nosana_price
         self.status_bucket = defaultdict(int)
         self.total_tokens = 0
         self.time_series = []
@@ -139,10 +143,11 @@ class MetricsCollector:
 
     def collect_response_status(self, status):
         self.status_bucket[status] += 1
-
-    def collect_tokens(self, count):
-        self.total_tokens += count
-        self.response_word_bucket[int(time.time())] += count
+        
+    def collect_tokens(self, output_count, input_count=0):
+            self.total_tokens += output_count
+            self.total_input_tokens += input_count  # Increment the total input tokens
+            self.response_word_bucket[int(time.time())] += output_count
 
     async def report_loop(self, time_window=10):
         try: #test
@@ -174,6 +179,8 @@ class MetricsCollector:
         self.gpu_monitor.stop_monitoring.set() 
         if hasattr(self.gpu_monitor, 'monitoring_thread'):
             self.gpu_monitor.monitoring_thread.join()
+
+
     def final_report(self, num_clients):
         total_duration = time.time() - self.start_time
         average_tokens_per_second = self.total_tokens / total_duration
@@ -185,15 +192,17 @@ class MetricsCollector:
         avg_power_usage = np.mean([gpu['avg_power_usage'] for gpu in self.gpu_stats.values()])
         avg_utilization = np.mean([gpu['avg_utilization'] for gpu in self.gpu_stats.values()])
 
-        
+
         report = {
             "model_name": self.model_name,
             "total_duration": round(total_duration, 2),
             "total_tokens_produced": self.total_tokens,
+            "total_input_tokens": self.total_input_tokens,
             "average_tokens_per_second": round(average_tokens_per_second, 2),
             "total_requests_made": self.total_requests,
             "status_distribution": dict(self.status_bucket),
             "average_latency": round(sum(self.latency_series) / len(self.latency_series), 2) if self.latency_series else None,
+            "Nosana_Price": self.nosana_price,  
             "avg_clock_speed": avg_clock_speed,
             "avg_power_usage": avg_power_usage,
             "avg_utilization": avg_utilization
@@ -250,7 +259,10 @@ class User:
 
     async def make_request(self):
         prompt = random.choice(self.prompts)
-        request_data = self.handler.get_request_data(prompt['instruction'] + " " + prompt['context'])
+        prompt_text = prompt['instruction'] + " " + prompt['context']
+        input_tokens = count_tokens(prompt_text) 
+
+        request_data = self.handler.get_request_data(prompt_text)
         headers = self.handler.get_headers()
         url = self.handler.get_request_url()
 
@@ -268,7 +280,7 @@ class User:
                             response_text = response_json['choices'][0]['message']['content']
 
                         tokens = len(response_text.split())
-                        self.collector.collect_tokens(tokens)
+                        self.collector.collect_tokens(tokens, input_tokens)
                         self.tokens += tokens
                     else:
                         print(f"Unexpected status {response.status} received for request {self.request_count}", flush=True)
@@ -412,6 +424,17 @@ async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_
 
     return response_times
 
+async def get_nosana_price(session):
+    url = "https://public-api.birdeye.so/defi/price?address=nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7"
+    headers = {"X-API-KEY": "9fa10c038f3349aa9ba5f43b70755baf"}
+    async with session.get(url, headers=headers) as response:
+        if response.status == 200:
+            data = await response.json()
+            return data['data']['value']
+        else:
+            print(f"Failed to fetch Nosana price, status: {response.status}")
+            return None
+
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     
     print(f"Starting benchmark service for model {model}")
@@ -419,6 +442,9 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
     handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)
     await wait_for_service(handler)
+
+    async with aiohttp.ClientSession() as session:
+        nosana_price = await get_nosana_price(session)
 
     print("Testing latency...")
 
@@ -428,7 +454,7 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
 
     for num_clients in num_clients_list:
         
-        collector = MetricsCollector(model_name=model, session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
+        collector = MetricsCollector(model_name=model, session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0, nosana_price=nosana_price)
         collector.run_name = run_name
         collector.start_gpu_monitoring()
 
