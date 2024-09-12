@@ -15,10 +15,6 @@ import subprocess
 import threading 
 from .sysmain import get_extra
 from datetime import datetime 
-import psycopg2
-from psycopg2 import sql
-
-
 
 def get_gpu_info():
     """Retrieve GPU clock speed, power usage, and utilization for all GPUs."""
@@ -70,34 +66,36 @@ class GPUMonitor:
                         'power_usage': gpu['power_usage'],
                         'utilization': gpu['utilization']
                     })
-                time.sleep(1) 
+                time.sleep(1)  # Collect data every second
             except Exception as e:
                 print(f"Error in GPU monitoring thread: {e}")
-                time.sleep(1) 
+                time.sleep(1)  # Wait a bit before trying again
 
     def get_gpu_stats(self, start_time, end_time):
         start_time_dt = datetime.fromtimestamp(start_time)
         end_time_dt = datetime.fromtimestamp(end_time)
         relevant_data = [d for d in self.gpu_data if start_time_dt <= datetime.fromisoformat(d['timestamp']) <= end_time_dt]
-        
         if relevant_data:
-            flat_stats = {}
+            stats = defaultdict(lambda: {'clock_speed': [], 'power_usage': [], 'utilization': []})
             for d in relevant_data:
-                gpu_id = d['gpu_index']
-                flat_stats[f'gpu_{gpu_id}_clock_speed'] = d['clock_speed']
-                flat_stats[f'gpu_{gpu_id}_power_usage'] = d['power_usage']
-                flat_stats[f'gpu_{gpu_id}_utilization'] = d['utilization']
+                stats[d['gpu_index']]['clock_speed'].append(d['clock_speed'])
+                stats[d['gpu_index']]['power_usage'].append(d['power_usage'])
+                stats[d['gpu_index']]['utilization'].append(d['utilization'])
             
-            # Average the stats across the time period
-            avg_stats = {key: np.mean([d[key] for d in relevant_data if key in d]) for key in flat_stats.keys()}
-            return avg_stats
-        
+            return {
+                gpu_index: {
+                    'avg_clock_speed': sum(data['clock_speed']) / len(data['clock_speed']),
+                    'avg_power_usage': sum(data['power_usage']) / len(data['power_usage']),
+                    'avg_utilization': sum(data['utilization']) / len(data['utilization'])
+                }
+                for gpu_index, data in stats.items()
+            }
         return {}
 
     
-
 class MetricsCollector:
-    def __init__(self, session_time=None, ping_latency=0.0):
+    def __init__(self, model_name, session_time=None, ping_latency=0.0):
+        self.model_name = model_name 
         self.start_time = time.time()
         self.response_word_bucket = defaultdict(int)
         self.response_latency_bucket = defaultdict(list)
@@ -116,6 +114,7 @@ class MetricsCollector:
         self.last_report_tokens = 0
         self.gpu_monitor = GPUMonitor()
         self.gpu_stats = {}
+
 
     @contextlib.contextmanager
     def collect_http_request(self):
@@ -180,15 +179,24 @@ class MetricsCollector:
         average_tokens_per_second = self.total_tokens / total_duration
         
         self.gpu_stats = self.gpu_monitor.get_gpu_stats(self.start_time, time.time())
+    
+        
+        avg_clock_speed = np.mean([gpu['avg_clock_speed'] for gpu in self.gpu_stats.values()])
+        avg_power_usage = np.mean([gpu['avg_power_usage'] for gpu in self.gpu_stats.values()])
+        avg_utilization = np.mean([gpu['avg_utilization'] for gpu in self.gpu_stats.values()])
+
         
         report = {
+            "model_name": self.model_name,
             "total_duration": round(total_duration, 2),
             "total_tokens_produced": self.total_tokens,
             "average_tokens_per_second": round(average_tokens_per_second, 2),
             "total_requests_made": self.total_requests,
             "status_distribution": dict(self.status_bucket),
             "average_latency": round(sum(self.latency_series) / len(self.latency_series), 2) if self.latency_series else None,
-            **self.gpu_stats  # Spread the flat GPU stats into the report
+            "avg_clock_speed": avg_clock_speed,
+            "avg_power_usage": avg_power_usage,
+            "avg_utilization": avg_utilization
         }
         
         print(f"{num_clients} CU: {json.dumps(report)}")
@@ -196,7 +204,6 @@ class MetricsCollector:
         return report
 
 
-    
 
    
 class FrameworkHandler:
@@ -407,7 +414,7 @@ async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_
 
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     
-    print("Starting benchmark service...")
+    print(f"Starting benchmark service for model {model}")
 
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
     handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)
@@ -420,9 +427,8 @@ async def run_benchmark_series(num_clients_list, job_length, url, framework, mod
     print(f"Ping latency: {ping_latency:.4f} seconds")
 
     for num_clients in num_clients_list:
-        print(f"\nRunning benchmark for model {model} with {num_clients} CU")
         
-        collector = MetricsCollector(session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
+        collector = MetricsCollector(model_name=model, session_time=job_length, ping_latency=ping_latency - 0.005 if ping_correction else 0)
         collector.run_name = run_name
         collector.start_gpu_monitoring()
 
