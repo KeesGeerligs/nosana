@@ -13,21 +13,23 @@
             "lmdeploy",
             "serve",
             "api_server",
-            "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+            "../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396",
             "--model-name",
             "llama3.1",
             "--chat-template",
-            "/chat_template.json",
-            "--model-format",
-            "awq"
+            "/chat_template.json"
           ],
           "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.3",
           "gpu": true,
-          "expose": 23333
-          
+          "expose": 23333,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
+              "target": "/root/"
+            }
+          ]
         }
       }
     ]
-}
-  
-  
+  }

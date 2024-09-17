@@ -10,8 +10,6 @@
         "id": "lmdeploy-llama3.1-turbomind",
         "args": {
           "cmd": [
-            "timeout", 
-            "50m",
             "lmdeploy",
             "serve",
             "api_server",
