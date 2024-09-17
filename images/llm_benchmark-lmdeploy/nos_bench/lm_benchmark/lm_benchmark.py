@@ -256,8 +256,10 @@ class User:
         self.user_id = user_id
         self.tokens = 0
         self.request_count = 0
+        self.consecutive_404_count = 0
+        self.start_404_time = None
 
-    async def make_request(self):
+    async def make_request(self, timeout_minutes=5):
         prompt = random.choice(self.prompts)
         prompt_text = prompt['instruction'] + " " + prompt['context']
         input_tokens = count_tokens(prompt_text) 
@@ -282,8 +284,19 @@ class User:
                         tokens = len(response_text.split())
                         self.collector.collect_tokens(tokens, input_tokens)
                         self.tokens += tokens
+                    elif response.status == 404:
+                        if self.consecutive_404_count == 0:
+                            self.start_404_time = time.time()  # Start tracking time from the first 404
+                        self.consecutive_404_count += 1
+
+                        elapsed_time = time.time() - self.start_404_time
+                        if elapsed_time >= timeout_minutes * 60:
+                            raise Exception(f"Exited: Model returned 404 for {timeout_minutes} minute(s) straight.")
+                        
+                        print(f"404 error encountered. {self.consecutive_404_count} consecutive 404s. Elapsed time: {elapsed_time // 60} minute(s).", flush=True)
                     else:
                         print(f"Unexpected status {response.status} received for request {self.request_count}", flush=True)
+
         except Exception as e:
             print(f"User {self.user_id} Request {self.request_count} failed: {e}", flush=True)
 
@@ -387,12 +400,14 @@ def load_prompts(file_path, max_tokens=512):
         all_prompts = [json.loads(line) for line in f if line.strip()]
     return filter_prompts(all_prompts, max_tokens)
 
-async def wait_for_service(handler: FrameworkHandler, check_interval=30):
+async def wait_for_service(handler: FrameworkHandler, check_interval=30, timeout_minutes=None):
     ping_url = handler.get_request_url()
     ping_data = handler.get_request_data("ping")
     headers = handler.get_headers()
 
     start_time = time.time()
+    timeout_seconds = timeout_minutes * 60 if timeout_minutes else None  # Convert minutes to seconds if provided
+
     while True:
         try:
             async with aiohttp.ClientSession() as session:
@@ -401,7 +416,14 @@ async def wait_for_service(handler: FrameworkHandler, check_interval=30):
                         return time.time() - start_time
         except aiohttp.ClientError:
             pass
+
+        elapsed_time = time.time() - start_time
+
+        if timeout_seconds and elapsed_time >= timeout_seconds:
+            raise Exception(f"Exited: Model wasn't online after {timeout_minutes} minute(s).")
+        
         await asyncio.sleep(check_interval)
+
 
 async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_check=False):
     response_times = []
@@ -435,13 +457,13 @@ async def get_nosana_price(session):
             print(f"Failed to fetch Nosana price, status: {response.status}")
             return None
 
-async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
+async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, timeout_minutes, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     
     print(f"Starting benchmark service for model {model}")
 
     prompts = load_prompts('databricks-dolly-15k.jsonl')  
     handler = FrameworkHandler(framework, url, model, token, endpoint, use_prompt_field)
-    await wait_for_service(handler)
+    await wait_for_service(handler, timeout_minutes=timeout_minutes)
 
     async with aiohttp.ClientSession() as session:
         nosana_price = await get_nosana_price(session)
@@ -486,6 +508,7 @@ def main():
     parser.add_argument('--token', type=str, help='Authorization token')
     parser.add_argument('--endpoint', type=str, help='API endpoint for the requests', default='/v1/chat/completions')
     parser.add_argument('--use_prompt_field', action='store_true', help='Use the prompt field instead of messages')
+    parser.add_argument('--timeout_minutes', type=int, help='Timeout in minutes for the service to come online', default=10)
     args = parser.parse_args()
 
     sys_info = get_extra()
@@ -500,6 +523,7 @@ def main():
         args.run_name,
         args.ping_correction,
         args.enable_aimd,
+        args.timeout_minutes,
         args.token,
         args.endpoint,
         args.use_prompt_field
