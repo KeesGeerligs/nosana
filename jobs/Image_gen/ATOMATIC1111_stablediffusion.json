@@ -1,0 +1,20 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "invokeai_stablediffusion",
+        "args": {
+          "cmd": [],
+          "image": "docker.io/goolashe/automatic1111-sd-webui",
+          "gpu": true,
+          "expose": 7860
+          
+        }
+      }
+    ]
+}
