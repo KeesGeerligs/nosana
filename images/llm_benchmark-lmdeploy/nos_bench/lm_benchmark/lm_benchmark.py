@@ -446,16 +446,28 @@ async def get_ping_latencies(handler: FrameworkHandler, num_samples, use_health_
 
     return response_times
 
-async def get_nosana_price(session):
+async def get_nosana_price(session, retries=5, delay=5):
     url = "https://public-api.birdeye.so/defi/price?address=nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7"
     headers = {"X-API-KEY": "9fa10c038f3349aa9ba5f43b70755baf"}
-    async with session.get(url, headers=headers) as response:
-        if response.status == 200:
-            data = await response.json()
-            return data['data']['value']
-        else:
-            print(f"Failed to fetch Nosana price, status: {response.status}")
-            return None
+    
+    for attempt in range(retries):
+        try:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data['data']['value']
+                else:
+                    print(f"Failed to fetch Nosana price, status: {response.status}")
+                    return None  # Return None if non-200 response
+        except aiohttp.ClientConnectorError as e:
+            print(f"Attempt {attempt + 1}/{retries} failed with error: {e}")
+            if attempt < retries - 1:
+                await asyncio.sleep(delay)
+            else:
+                print("Could not fetch Nosana price after several attempts, continuing without it.")
+                return None  # Return None if all retries fail
+
+    return None
 
 async def run_benchmark_series(num_clients_list, job_length, url, framework, model, run_name, ping_correction, enable_aimd, timeout_minutes, token=None, endpoint='/v1/chat/completions', use_prompt_field=False):
     
@@ -508,7 +520,7 @@ def main():
     parser.add_argument('--token', type=str, help='Authorization token')
     parser.add_argument('--endpoint', type=str, help='API endpoint for the requests', default='/v1/chat/completions')
     parser.add_argument('--use_prompt_field', action='store_true', help='Use the prompt field instead of messages')
-    parser.add_argument('--timeout_minutes', type=int, help='Timeout in minutes for the service to come online', default=10)
+    parser.add_argument('--timeout_minutes', type=int, help='Timeout in minutes for the service to come online', default=3)
     args = parser.parse_args()
 
     sys_info = get_extra()

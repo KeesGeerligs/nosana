@@ -11,7 +11,7 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --ping_correction --job_length 900 --model llama3.1_70B_4x; sleep 1h"
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --timeout_minutes 1 --ping_correction --job_length 10 --model llama3.1_70B_4x; sleep 1h"
         ],
         "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.4",
         "gpu": true,
