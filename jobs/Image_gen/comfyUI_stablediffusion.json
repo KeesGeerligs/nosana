@@ -1,20 +1,19 @@
 {
-    "version": "0.1",
-    "type": "container",
-    "meta": {
-      "trigger": "cli"
-    },
-    "ops": [
-      {
-        "type": "container/run",
-        "id": "comfyui_stablediffusion",
-        "args": {
-          "cmd": [],
-          "image": "docker.io/aidockorg/comfyui-cuda:v0.2.0",
-          "gpu": true,
-          "expose": 8888
-          
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "comfyui_stablediffusion",
+      "args": {
+        "cmd": [],
+        "image": "docker.io/aidockorg/comfyui-cuda:v0.2.0",
+        "gpu": true,
+        "expose": 23333
         }
       }
-    ]
+  ]
 }

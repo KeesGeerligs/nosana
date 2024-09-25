@@ -7,7 +7,7 @@
     "ops": [
       {
         "type": "container/run",
-        "id": "invokeai_stablediffusion",
+        "id": "auto1111_stablediffusion",
         "args": {
           "cmd": [],
           "image": "docker.io/goolashe/automatic1111-sd-webui",

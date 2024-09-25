@@ -1,0 +1,38 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "bench-SD-forge",
+        "args": {
+          "cmd": [
+            "/bin/sh", "-c", 
+            "echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 2m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 10 --model v1-5-pruned-emaonly"
+          ],
+          "image": "docker.io/k1llahkeezy/sd-forge-bench:0.0.3",
+          "gpu": true,
+          "env": {
+            "HF_HOME": "/root/.cache/huggingface/",
+            "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
+          }},
+          "results":{
+            "results_batchsize_1": "(?<=Batch Size 1: ).*",
+            "results_batchsize_2": "(?<=Batch Size 2: ).*",
+            "results_batchsize_3": "(?<=Batch Size 3: ).*",
+            "results_batchsize_4": "(?<=Batch Size 4: ).*",
+            "results_batchsize_5": "(?<=Batch Size 5: ).*",
+            "results_batchsize_6": "(?<=Batch Size 6: ).*",
+            "results_batchsize_7": "(?<=Batch Size 7: ).*",
+            "results_batchsize_8": "(?<=Batch Size 8: ).*",
+            "results_batchsize_9": "(?<=Batch Size 9: ).*",
+            "results_batchsize_10": "(?<=Batch Size 10: ).*",
+            "system_specs": "(?<=system specs: ).*"
+          } 
+      }
+    ]
+  }
+ 
