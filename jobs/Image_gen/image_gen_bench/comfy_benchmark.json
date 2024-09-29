@@ -7,13 +7,13 @@
     "ops": [
       {
         "type": "container/run",
-        "id": "bench-SD-forge",
+        "id": "bench-SD-comfy",
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 3>&1& sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 10 --model v1-5-pruned-emaonly --image-framework forge"
+            "echo \"Starting benchmarking service...\"; python -u main.py --listen --port 7860 & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly.ckpt --image-framework comfy"
           ],
-          "image": "docker.io/k1llahkeezy/sd-forge-bench:0.0.6",
+          "image": "docker.io/k1llahkeezy/sd-comfy-bench:0.0.1",
           "gpu": true,
           "env": {
             "HF_HOME": "/root/.cache/huggingface/",

@@ -11,9 +11,9 @@
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python -u launch.py --listen --port 7860 --allow-code --medvram --xformers --enable-insecure-extension-access --api & sleep 2m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly"
+            "echo \"Starting benchmarking service...\"; python -u launch.py --listen --port 7860 --allow-code --medvram --xformers --enable-insecure-extension-access --api & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly --image-framework auto"
           ],
-          "image": "docker.io/k1llahkeezy/sd-auto-bench:0.0.1",
+          "image": "docker.io/k1llahkeezy/sd-auto-bench:0.0.3",
           "gpu": true,
           "env": {
             "HF_HOME": "/root/.cache/huggingface/",

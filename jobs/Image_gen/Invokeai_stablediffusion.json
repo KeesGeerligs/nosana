@@ -1,20 +1,22 @@
 {
-    "version": "0.1",
-    "type": "container",
-    "meta": {
+  "version": "0.1",
+  "type": "container",
+  "meta": {
       "trigger": "cli"
-    },
-    "ops": [
+  },
+  "ops": [
       {
-        "type": "container/run",
-        "id": "invokeai_stablediffusion",
-        "args": {
-          "cmd": [],
-          "image": "ghcr.io/invoke-ai/invokeai",
-          "gpu": true,
-          "expose": 9090
-          
-        }
+          "type": "container/run",
+          "id": "invokeai_stablediffusion",
+          "args": {
+              "cmd": [
+                  "/bin/sh", "-c", 
+                  "echo \"Starting benchmarking service...\" && invokeai-web"
+              ],
+              "image": "ghcr.io/invoke-ai/invokeai",
+              "gpu": true,
+              "expose": 9090
+          }
       }
-    ]
+  ]
 }
