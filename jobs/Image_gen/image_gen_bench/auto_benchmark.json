@@ -11,14 +11,10 @@
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python -u launch.py --listen --port 7860 --allow-code --medvram --xformers --enable-insecure-extension-access --api & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly --image-framework auto"
+            "echo \"Starting benchmarking service...\"; python -u launch.py --listen --port 7860 --allow-code --medvram --xformers --enable-insecure-extension-access --api > /dev/null 2>&1 & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly --image-framework auto"
           ],
-          "image": "docker.io/k1llahkeezy/sd-auto-bench:0.0.3",
-          "gpu": true,
-          "env": {
-            "HF_HOME": "/root/.cache/huggingface/",
-            "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
-          }},
+          "image": "docker.io/nosana/sd-auto-bench:0.0.0",
+          "gpu": true},
           "results":{
             "results_batchsize_1": "(?<=Batch Size 1: ).*",
             "results_batchsize_2": "(?<=Batch Size 2: ).*",
