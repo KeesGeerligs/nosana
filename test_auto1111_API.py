@@ -1,159 +1,78 @@
-from datetime import datetime
-import urllib.request
+import requests
 import base64
-import json
-import time
-import os
+from PIL import Image
+import io
+import hashlib
+import numpy as np
+import sys
 
-webui_server_url = 'https://lneuxfi0jm6fg28bqiwgnkhkgw8sg0w0.node.k8s.prd.nos.ci'
-
-out_dir = 'api_out'
-out_dir_t2i = os.path.join(out_dir, 'txt2img')
-out_dir_i2i = os.path.join(out_dir, 'img2img')
-os.makedirs(out_dir_t2i, exist_ok=True)
-os.makedirs(out_dir_i2i, exist_ok=True)
-
-
-def timestamp():
-    return datetime.fromtimestamp(time.time()).strftime("%Y%m%d-%H%M%S")
-
-
-def encode_file_to_base64(path):
-    with open(path, 'rb') as file:
-        return base64.b64encode(file.read()).decode('utf-8')
-
-
-def decode_and_save_base64(base64_str, save_path):
-    with open(save_path, "wb") as file:
-        file.write(base64.b64decode(base64_str))
-
-
-def call_api(api_endpoint, **payload):
-    data = json.dumps(payload).encode('utf-8')
-    request = urllib.request.Request(
-        f'{webui_server_url}/{api_endpoint}',
-        headers={'Content-Type': 'application/json'},
-        data=data,
-    )
-    response = urllib.request.urlopen(request)
-    return json.loads(response.read().decode('utf-8'))
-
-
-def call_txt2img_api(**payload):
-    response = call_api('sdapi/v1/txt2img', **payload)
-    for index, image in enumerate(response.get('images')):
-        save_path = os.path.join(out_dir_t2i, f'txt2img-{timestamp()}-{index}.png')
-        decode_and_save_base64(image, save_path)
-
-
-def call_img2img_api(**payload):
-    response = call_api('sdapi/v1/img2img', **payload)
-    for index, image in enumerate(response.get('images')):
-        save_path = os.path.join(out_dir_i2i, f'img2img-{timestamp()}-{index}.png')
-        decode_and_save_base64(image, save_path)
-
-
-if __name__ == '__main__':
+def generate_image(prompt, seed, steps=20, width=512, height=512, cfg_scale=7.0, sampler_name='DPM++ 2M', api_base_url='http://localhost:7860'):
+    api_endpoint = f"{api_base_url}/sdapi/v1/txt2img"
     payload = {
-        "prompt": "masterpiece, (best quality:1.1), 1girl <lora:lora_model:1>",  # extra networks also in prompts
-        "negative_prompt": "",
-        "seed": 1,
-        "steps": 20,
-        "width": 512,
-        "height": 512,
-        "cfg_scale": 7,
-        "sampler_name": "DPM++ 2M",
-        "n_iter": 1,
-        "batch_size": 1,
-
-        # example args for x/y/z plot
-        # "script_name": "x/y/z plot",
-        # "script_args": [
-        #     1,
-        #     "10,20",
-        #     [],
-        #     0,
-        #     "",
-        #     [],
-        #     0,
-        #     "",
-        #     [],
-        #     True,
-        #     True,
-        #     False,
-        #     False,
-        #     0,
-        #     False
-        # ],
-
-        # example args for Refiner and ControlNet
-        # "alwayson_scripts": {
-        #     "ControlNet": {
-        #         "args": [
-        #             {
-        #                 "batch_images": "",
-        #                 "control_mode": "Balanced",
-        #                 "enabled": True,
-        #                 "guidance_end": 1,
-        #                 "guidance_start": 0,
-        #                 "image": {
-        #                     "image": encode_file_to_base64(r"B:\path\to\control\img.png"),
-        #                     "mask": None  # base64, None when not need
-        #                 },
-        #                 "input_mode": "simple",
-        #                 "is_ui": True,
-        #                 "loopback": False,
-        #                 "low_vram": False,
-        #                 "model": "control_v11p_sd15_canny [d14c016b]",
-        #                 "module": "canny",
-        #                 "output_dir": "",
-        #                 "pixel_perfect": False,
-        #                 "processor_res": 512,
-        #                 "resize_mode": "Crop and Resize",
-        #                 "threshold_a": 100,
-        #                 "threshold_b": 200,
-        #                 "weight": 1
-        #             }
-        #         ]
-        #     },
-        #     "Refiner": {
-        #         "args": [
-        #             True,
-        #             "sd_xl_refiner_1.0",
-        #             0.5
-        #         ]
-        #     }
-        # },
-        # "enable_hr": True,
-        # "hr_upscaler": "R-ESRGAN 4x+ Anime6B",
-        # "hr_scale": 2,
-        # "denoising_strength": 0.5,
-        # "styles": ['style 1', 'style 2'],
-        # "override_settings": {
-        #     'sd_model_checkpoint': "sd_xl_base_1.0",  # this can use to switch sd model
-        # },
+        "prompt": prompt,
+        "seed": seed,
+        "steps": steps,
+        "width": width,
+        "height": height,
+        "cfg_scale": cfg_scale,
+        "sampler_name": sampler_name
     }
-    call_txt2img_api(**payload)
+    response = requests.post(api_endpoint, json=payload)
+    response.raise_for_status()
+    data = response.json()
+    images = data['images']
 
-    init_images = [
-        encode_file_to_base64(r"B:\path\to\img_1.png"),
-        # encode_file_to_base64(r"B:\path\to\img_2.png"),
-        # "https://image.can/also/be/a/http/url.png",
-    ]
+    image_data = images[0]
+    image = decode_base64_image(image_data)
+    return image
 
-    batch_size = 2
-    payload = {
-        "prompt": "1girl, blue hair",
-        "seed": 1,
-        "steps": 20,
-        "width": 512,
-        "height": 512,
-        "denoising_strength": 0.5,
-        "n_iter": 1,
-        "init_images": init_images,
-        "batch_size": batch_size if len(init_images) == 1 else len(init_images),
-        # "mask": encode_file_to_base64(r"B:\path\to\mask.png")
-    }
-    # if len(init_images) > 1 then batch_size should be == len(init_images)
-    # else if len(init_images) == 1 then batch_size can be any value int >= 1
-    call_img2img_api(**payload)
+def decode_base64_image(image_data):
+    if ',' in image_data:
+        header, encoded = image_data.split(',', 1)
+    else:
+        encoded = image_data
+    image_bytes = base64.b64decode(encoded)
+    image = Image.open(io.BytesIO(image_bytes))
+    return image
+
+def compare_images(image1, image2):
+    np_image1 = np.array(image1)
+    np_image2 = np.array(image2)
+    return np.array_equal(np_image1, np_image2)
+
+def compute_image_hash(image):
+    image_bytes = io.BytesIO()
+    image.save(image_bytes, format='PNG')
+    image_hash = hashlib.sha256(image_bytes.getvalue()).hexdigest()
+    return image_hash
+
+def main():
+    if len(sys.argv) < 4:
+        print("Usage: python check_image.py <prompt> <seed> <image_file> [api_base_url]")
+        sys.exit(1)
+    prompt = sys.argv[1]
+    seed = int(sys.argv[2])
+    image_file = sys.argv[3]
+    api_base_url = 'http://localhost:7860'
+    if len(sys.argv) >= 5:
+        api_base_url = sys.argv[4]
+    provided_image = Image.open(image_file).convert('RGB')
+    generated_image = generate_image(prompt, seed, api_base_url=api_base_url).convert('RGB')
+    if compare_images(provided_image, generated_image):
+        print("The image matches the generated image.")
+        provided_hash = compute_image_hash(provided_image)
+        generated_hash = compute_image_hash(generated_image)
+        print(f"Provided image hash: {provided_hash}")
+        print(f"Generated image hash: {generated_hash}")
+        generated_image.save('generated_image.png')
+    else:
+        print("The image does NOT match the generated image.")
+        provided_hash = compute_image_hash(provided_image)
+        generated_hash = compute_image_hash(generated_image)
+        print(f"Provided image hash: {provided_hash}")
+        print(f"Generated image hash: {generated_hash}")
+        generated_image.save('generated_image.png')
+        print("Generated image saved as 'generated_image.png' for manual inspection.")
+
+if __name__ == "__main__":
+    main()
