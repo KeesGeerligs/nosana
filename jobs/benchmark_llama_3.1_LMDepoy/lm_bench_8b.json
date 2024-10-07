@@ -10,12 +10,12 @@
       "id": "lm-benchmark-llama3.1",
       "args": {
         "cmd": [
-          "/bin/sh", "-c", 
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --model-name llama3.1_8B --chat-template /chat_template.json & sleep 30 & echo \"Running lm-benchmark...\" & lm-benchmark --url http://localhost:23333 --ping_correction --job_length 10 --model llama3.1_8B"
+          "/bin/sh",
+          "-c",
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --model-name llama3.1_8B --chat-template /chat_template.json > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 10 --model llama3.1_8B --timeout 5  --llm-framework lmdeploy"
         ],
-        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.0",
+        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.4",
         "gpu": true,
-        "expose": 23333,
         "env": {
           "HF_HOME": "/root/.cache/huggingface/",
           "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
@@ -23,18 +23,19 @@
         "resources": [
           {
             "type": "S3",
-            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
+            "url": "https://models.nosana.io/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
             "target": "/root/"
           }
-        ]},
-        "results":{
-          "results_CU_100": "(?<=100 CU: ).*",
-          "results_CU_50": "(?<=50 CU: ).*",
-          "results_CU_10": "(?<=10 CU: ).*",
-          "results_CU_5": "(?<=5 CU: ).*",
-          "results_CU_1": "(?<=1 CU: ).*",
-          "system_specs": "(?<=system specs: ).*"
-        } 
+        ]
+      },
+      "results": {
+        "results_CU_100": "(?<=100 CU: ).*",
+        "results_CU_50": "(?<=50 CU: ).*",
+        "results_CU_10": "(?<=10 CU: ).*",
+        "results_CU_5": "(?<=5 CU: ).*",
+        "results_CU_1": "(?<=1 CU: ).*",
+        "system_specs": "(?<=system specs: ).*"
+      }
     }
   ]
 }

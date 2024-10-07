@@ -10,12 +10,12 @@
       "id": "lm-benchmark-llama3.1",
       "args": {
         "cmd": [
-          "/bin/sh", "-c", 
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30; echo \"Running lm-benchmark...\"; lm-benchmark --url http://localhost:23333 --timeout_minutes 1 --ping_correction --job_length 10 --model llama3.1_70B_4x; sleep 1h"
+          "/bin/sh",
+          "-c",
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 10 --model llama3.1_70B_4x --timeout 5 --llm-framework lmdeploy"
         ],
-        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.0.4",
+        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.4",
         "gpu": true,
-        "expose": 23333,
         "env": {
           "HF_HOME": "/root/.cache/huggingface/",
           "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
@@ -23,18 +23,19 @@
         "resources": [
           {
             "type": "S3",
-            "url": "s3://nos-ai-models-qllsn32u/hugging-face/llama3.1/70b/4x/models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+            "url": "https://models.nosana.io/hugging-face/llama3.1/70b/4x/models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
             "target": "/root/"
           }
-        ]},
-        "results":{
-          "results_CU_100": "(?<=100 CU: ).*",
-          "results_CU_50": "(?<=50 CU: ).*",
-          "results_CU_10": "(?<=10 CU: ).*",
-          "results_CU_5": "(?<=5 CU: ).*",
-          "results_CU_1": "(?<=1 CU: ).*",
-          "system_specs": "(?<=system specs: ).*"
-        } 
+        ]
+      },
+      "results": {
+        "results_CU_100": "(?<=100 CU: ).*",
+        "results_CU_50": "(?<=50 CU: ).*",
+        "results_CU_10": "(?<=10 CU: ).*",
+        "results_CU_5": "(?<=5 CU: ).*",
+        "results_CU_1": "(?<=1 CU: ).*",
+        "system_specs": "(?<=system specs: ).*"
+      }
     }
   ]
 }
