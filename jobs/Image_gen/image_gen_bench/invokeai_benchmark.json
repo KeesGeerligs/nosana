@@ -11,9 +11,9 @@
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\" && invokeai-web > /dev/null 2>&1 & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:9090 --model \"v1-5-pruned-emaonly.ckpt\" --job-length 1000 --image-framework invokeai"
+            "echo \"Starting benchmarking service...\" && invokeai-web > /dev/null 2>&1 & sleep 5m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:9090 --model \"v1-5-pruned-emaonly.ckpt\" --job-length 10 --image-framework invokeai"
         ],
-          "image": "docker.io/nosana/sd-invoke-bench:0.0.0",
+          "image": "docker.io/nosana/sd-invoke-bench:0.0.1",
           "gpu": true},
           "results":{
             "results_batchsize_1": "(?<=Batch Size 1: ).*",
