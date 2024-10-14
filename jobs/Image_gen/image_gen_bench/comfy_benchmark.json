@@ -11,9 +11,9 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "echo \"Starting benchmarking service...\"; python -u main.py --listen --port 7860 > /dev/null 2>&1 & sleep 2m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 10 --model v1-5-pruned-emaonly.safetensors --image-framework comfy"
+          "echo \"Starting benchmarking service...\"; python -u main.py --listen --port 7860 > /dev/null 2>&1 & sleep 2m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 400 --model v1-5-pruned-emaonly.safetensors --image-framework comfy"
         ],
-        "image": "docker.io/nosana/sd-comfy-bench:0.0.5",
+        "image": "docker.io/nosana/sd-comfy-bench:0.1.0",
         "gpu": true},
         "results":{
           "results_batchsize_1": "(?<=Batch Size 1: ).*",
