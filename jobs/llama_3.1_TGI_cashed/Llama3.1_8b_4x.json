@@ -9,15 +9,13 @@
       "type": "container/run",
       "id": "TGI-llama3.1",
       "args": {
+        "entrypoint": [],
         "cmd": [
-          "--model-id",
-          "/root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91",
-          "--quantize",
-          "awq",
-          "--port",
-          "8080"
+          "/bin/bash",
+          "-c",
+          "text-generation-launcher --model-id /root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --quantize awq --port 8080"
         ],
-        "image": "ghcr.io/huggingface/text-generation-inference:2.2.0",
+        "image": "ghcr.io/huggingface/text-generation-inference:2.3.1",
         "gpu": true,
         "expose": 8080,
         "resources": [
