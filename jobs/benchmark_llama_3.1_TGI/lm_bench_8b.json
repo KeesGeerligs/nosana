@@ -15,7 +15,7 @@
           "-c",
           "text-generation-launcher --model-id ../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --port 8080 > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8080 --ping_correction --job-length 900 --model llama3.1_8B --timeout 10 --llm-framework tgi --endpoint /v1/completions --use_prompt_field"
         ],
-        "image": "docker.io/nosana/llm_benchmark-tgi:0.0.6",
+        "image": "docker.io/nosana/llm_benchmark-tgi:0.2.0",
         "gpu": true,
         "resources": [
           {

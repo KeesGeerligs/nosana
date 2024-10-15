@@ -14,7 +14,7 @@
           "-c",
           "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 900 --model llama3.1_70B_4x --timeout 10 --llm-framework lmdeploy"
         ],
-        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.7",
+        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.2.0",
         "gpu": true,
         "resources": [
           {

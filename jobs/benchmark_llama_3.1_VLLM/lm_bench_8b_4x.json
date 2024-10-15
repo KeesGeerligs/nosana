@@ -15,7 +15,7 @@
           "-c",
           "python3 -m vllm.entrypoints.openai.api_server --model ../../root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --served-model-name llama3.1_8B_4x --quantization awq --max-model-len 2176 > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8000 --ping_correction --job-length 900 --model llama3.1_8B_4x --timeout 10 --llm-framework vllm"
         ],
-        "image": "docker.io/nosana/llm_benchmark-vllm:0.0.2",
+        "image": "docker.io/nosana/llm_benchmark-vllm:0.2.0",
         "gpu": true,
         "resources": [
           {

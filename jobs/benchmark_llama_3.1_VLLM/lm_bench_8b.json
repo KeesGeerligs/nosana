@@ -13,9 +13,9 @@
         "cmd": [
           "/bin/sh",
           "-c",
-          "python3 -m vllm.entrypoints.openai.api_server --model ../../root/.cache/huggingface/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --served-model-name llama3.1_8B --max-model-len 2176> /dev/null & sleep 7m & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8000 --ping_correction --job-length 900 --model llama3.1_8B --timeout 10 --llm-framework vllm"
+          "python3 -m vllm.entrypoints.openai.api_server --model ../../root/.cache/huggingface/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --served-model-name llama3.1_8B --max-model-len 2176> /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8000 --ping_correction --job-length 900 --model llama3.1_8B --timeout 10 --llm-framework vllm"
         ],
-        "image": "docker.io/nosana/llm_benchmark-vllm:0.0.2",
+        "image": "docker.io/nosana/llm_benchmark-vllm:0.2.0",
         "gpu": true,
         "resources": [
           {
