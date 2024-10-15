@@ -7,24 +7,21 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "lm-benchmark-llama3.1",
+      "id": "VLLM-llama3.1",
       "args": {
+        "entrypoint": [],
         "cmd": [
           "/bin/sh",
           "-c",
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --model-name llama3.1_8B --chat-template /chat_template.json > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 10 --model llama3.1_8B --timeout 5  --llm-framework lmdeploy"
+          "python3 -m vllm.entrypoints.openai.api_server --model ../../root/.cache/huggingface/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B/snapshots/069adfb3ab0ceba60b9af8f11fa51558b9f9d396 --served-model-name llama3.1_8B --max-model-len 2176> /dev/null & sleep 7m & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8000 --ping_correction --job-length 900 --model llama3.1_8B --timeout 10 --llm-framework vllm"
         ],
-        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.7",
+        "image": "docker.io/nosana/llm_benchmark-vllm:0.0.2",
         "gpu": true,
-        "env": {
-          "HF_HOME": "/root/.cache/huggingface/",
-          "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
-        },
         "resources": [
           {
             "type": "S3",
             "url": "https://models.nosana.io/hugging-face/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B",
-            "target": "/root/"
+            "target": "/root/.cache/huggingface/llama3.1/8b/models--unsloth--Meta-Llama-3.1-8B"
           }
         ]
       },

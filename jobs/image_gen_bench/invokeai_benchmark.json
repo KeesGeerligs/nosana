@@ -11,10 +11,18 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "echo \"Starting benchmarking service...\" && invokeai-web > /dev/null 2>&1 & sleep 2m; echo \"Running bench...\"; bench --benchmark image --url http://localhost:9090 --model \"v1-5-pruned-emaonly.safetensors\" --job-length 3000 --image-framework invokeai"
+          "echo \"Starting benchmarking service...\" && invokeai-web > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:9090 --model \"v1-5-pruned-emaonly.safetensors\" --job-length 4200 --image-framework invokeai"
       ],
         "image": "docker.io/nosana/sd-invoke-bench:0.1.0",
-        "gpu": true},
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/invokeai/models/stable-diffusion"
+          }
+        ]
+      },
         "results":{
           "results_batchsize_1": "(?<=Batch Size 1: ).*",
           "system_specs": "(?<=system specs: ).*"

@@ -7,19 +7,15 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "lm-benchmark-llama3.1",
+      "id": "LMDeploy-llama3.1",
       "args": {
         "cmd": [
           "/bin/sh",
           "-c",
-          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 10 --model llama3.1_70B_4x --timeout 5 --llm-framework lmdeploy"
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/2123003760781134cfc31124aa6560a45b491fdf --model-name llama3.1_70B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 900 --model llama3.1_70B_4x --timeout 10 --llm-framework lmdeploy"
         ],
         "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.1.7",
         "gpu": true,
-        "env": {
-          "HF_HOME": "/root/.cache/huggingface/",
-          "TRANSFORMERS_CACHE": "/root/.cache/huggingface/"
-        },
         "resources": [
           {
             "type": "S3",
