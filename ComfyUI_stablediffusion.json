@@ -7,7 +7,7 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "bench-SD-comfy",
+      "id": "comfy_stablediffusion",
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
