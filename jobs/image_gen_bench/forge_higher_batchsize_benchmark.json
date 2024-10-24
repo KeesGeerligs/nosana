@@ -1,0 +1,37 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "benchmark"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "bench-SD-forge",
+      "args": {
+        "cmd": [
+          "/bin/sh", "-c", 
+          "echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 912 --model v1-5-pruned-emaonly --image-framework forge --batch-size-list 1 10 20 30 50"
+        ],
+        "image": "docker.io/nosana/sd-forge-bench:0.2.1",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
+          }
+        ]
+      },
+        "results":{
+          "results_batchsize_1": "(?<=Batch Size 1: ).*",
+          "results_batchsize_10": "(?<=Batch Size 10: ).*",
+          "results_batchsize_20": "(?<=Batch Size 20: ).*",
+          "results_batchsize_30": "(?<=Batch Size 30: ).*",
+          "results_batchsize_50": "(?<=Batch Size 50: ).*",
+          "system_specs": "(?<=system specs: ).*"
+        } 
+    }
+  ]
+}
+

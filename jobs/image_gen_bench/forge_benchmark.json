@@ -11,9 +11,9 @@
       "args": {
         "cmd": [
           "/bin/sh", "-c", 
-          "echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 456 --model v1-5-pruned-emaonly --image-framework forge"
+          "echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 10 --model v1-5-pruned-emaonly --image-framework forge"
         ],
-        "image": "docker.io/nosana/sd-forge-bench:0.2.0",
+        "image": "docker.io/nosana/sd-forge-bench:0.2.2",
         "gpu": true,
         "resources": [
           {

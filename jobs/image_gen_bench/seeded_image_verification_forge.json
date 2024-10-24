@@ -2,20 +2,19 @@
     "version": "0.1",
     "type": "container",
     "meta": {
-      "trigger": "cli"
+      "trigger": "benchmark"
     },
     "ops": [
       {
         "type": "container/run",
-        "id": "forge_stablediffusion",
+        "id": "bench-SD-forge",
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python -u launch.py --nowebui --api "
+            "echo \"Starting forge service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 60; echo \"Running bench...\"; bench --TTFI-verification --url http://localhost:7861 --ttfi-gpu-type \"RTX 4090\" --ttfi-num-batches 3 --ttfi-batch 30"
           ],
-          "image": "docker.io/nosana/sd-forge-bench:0.2.5",
+          "image": "docker.io/nosana/sd-forge-bench:0.2.7",
           "gpu": true,
-          "expose": 7861,
           "resources": [
             {
               "type": "S3",
@@ -23,8 +22,9 @@
               "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
             }
           ]
-          
         }
       }
     ]
-}
+  }
+  
+  
