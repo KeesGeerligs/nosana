@@ -11,9 +11,9 @@
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python -u launch.py --nowebui --api "
+            "echo \"Starting benchmarking service...\"; python -u launch.py --api --listen --pytorch-deterministic --port 7861 --disable-xformers"
           ],
-          "image": "docker.io/nosana/sd-forge-bench:0.2.5",
+          "image": "docker.io/nosana/sd-forge-bench:0.2.9.6",
           "gpu": true,
           "expose": 7861,
           "resources": [
