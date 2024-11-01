@@ -12,7 +12,7 @@
         "cmd": [
           "/bin/bash",
           "-c",
-          "echo \"Running GPU check...\"; if bench --check-specs --check-gpu; then echo \"GPU check passed. Proceeding with benchmarks...\"; echo \"nvidia-smi output:\"; nvidia-smi; echo \"Running NN benchmark with 1000 samples...\"; bench --benchmark nn --num-samples 1000; echo \"Running NN benchmark with 5000 samples...\"; bench --benchmark nn --num-samples 1000; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+          "echo \"Running GPU check...\"; if bench --check-specs --check-gpu; then echo \"GPU check passed. Proceeding with benchmarks...\"; echo \"nvidia-smi output:\"; nvidia-smi; echo \"Running NN benchmark with 1000 samples...\"; bench --benchmark nn --num-samples 1000; echo \"Running NN benchmark with 5000 samples...\"; bench --benchmark nn --num-samples 5000; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
         ],
         "image": "docker.io/nosana/seeded_nn_image:0.2.5",
         "gpu": true,
@@ -61,7 +61,7 @@
         "cmd": [
           "/bin/bash",
           "-c",
-          "echo \"Starting benchmarking service...\"; python /opt/stable-diffusion-webui-forge/launch.py --nowebui --api  --pytorch-deterministic --disable-xformers --always-gpu --all-in-fp16 --attention-pytorch > /dev/null & sleep 30; echo \"Running Forge image benchmark...\"; bench --benchmark image --url http://localhost:7861  --job-length 10 --model v1-5-pruned-emaonly --image-framework forge --batch-size-list 1 10 20 30 50"
+          "echo \"Starting benchmarking service...\"; python /opt/stable-diffusion-webui-forge/launch.py --nowebui --api  --pytorch-deterministic --disable-xformers --always-gpu --all-in-fp16 --attention-pytorch > /dev/null & sleep 30; echo \"Running Forge image benchmark...\"; bench --benchmark image --url http://localhost:7861  --job-length 850 --model v1-5-pruned-emaonly --image-framework forge --batch-size-list 1 10 20 30 50"
         ],
         "image": "docker.io/nosana/seeded_nn_image:0.2.5",
         "gpu": true,

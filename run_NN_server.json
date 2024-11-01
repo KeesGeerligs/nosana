@@ -1,0 +1,23 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+        "trigger": "cli"
+    },
+    "ops": [
+        {
+            "type": "container/run",
+            "id": "nn_server",
+            "args": {
+                "cmd": [
+                    "/bin/sh",
+                    "-c",
+                    "echo \"Starting NN server...\"; nn_server"
+                ],
+                "image": "docker.io/nosana/nn_server:0.0.0",
+                "gpu": true,
+                "expose": 8000
+            }
+        }
+    ]
+}
