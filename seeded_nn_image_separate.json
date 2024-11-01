@@ -1,0 +1,89 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "benchmark"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "nn-benchmark",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running GPU check...\"; if bench --check-specs --check-gpu; then echo \"GPU check passed. Proceeding with benchmarks...\"; echo \"nvidia-smi output:\"; nvidia-smi; echo \"Running NN benchmark with 1000 samples...\"; bench --benchmark nn --num-samples 1000; echo \"Running NN benchmark with 5000 samples...\"; bench --benchmark nn --num-samples 1000; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "docker.io/nosana/seeded_nn_image:0.2.5",
+        "gpu": true,
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "nn_benchmark_results_1": "(?<=NN benchmark results with 1000 samples: ).*",
+        "nn_benchmark_results_2": "(?<=NN benchmark results with 5000 samples: ).*",
+        "system_specs": "(?<=system specs: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "ttfi-info",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Starting benchmarking service...\"; python /opt/stable-diffusion-webui-forge/launch.py --nowebui --api  --pytorch-deterministic --disable-xformers --always-gpu --all-in-fp16 --attention-pytorch > /dev/null & sleep 30; echo \"Running TTFI benchmark...\"; bench --url http://localhost:7861  --TTFI-info"
+        ],
+        "image": "docker.io/nosana/seeded_nn_image:0.2.5",
+        "gpu": true,
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        },
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
+          }
+        ]
+      },
+      "results": {
+        "seed_prediction_results_v2": "(?<=TTFI-info benchmark: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "forge-image-benchmark",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Starting benchmarking service...\"; python /opt/stable-diffusion-webui-forge/launch.py --nowebui --api  --pytorch-deterministic --disable-xformers --always-gpu --all-in-fp16 --attention-pytorch > /dev/null & sleep 30; echo \"Running Forge image benchmark...\"; bench --benchmark image --url http://localhost:7861  --job-length 10 --model v1-5-pruned-emaonly --image-framework forge --batch-size-list 1 10 20 30 50"
+        ],
+        "image": "docker.io/nosana/seeded_nn_image:0.2.5",
+        "gpu": true,
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        },
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
+          }
+        ]
+      },
+      "results": {
+        "results_batchsize_1": "(?<=Batch Size 1: ).*",
+        "results_batchsize_10": "(?<=Batch Size 10: ).*",
+        "results_batchsize_20": "(?<=Batch Size 20: ).*",
+        "results_batchsize_30": "(?<=Batch Size 30: ).*",
+        "results_batchsize_50": "(?<=Batch Size 50: ).*"
+      }
+    }
+  ]
+}

@@ -11,7 +11,7 @@
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting forge service...\"; python launch.py --api --listen --pytorch-deterministic --disable-xformers --port 7861 & sleep 60; echo \"Running bench...\"; bench --TTFI-verification --url http://localhost:7861 --ttfi-gpu-type \"RTX 4090\" --ttfi-num-batches 1 --ttfi-batch 30 --ttfi-first-seed"
+            "echo \"Starting forge service...\"; python launch.py --api --listen --pytorch-deterministic --disable-xformers --always-gpu --all-in-fp16 --attention-pytorch --port 7861 & sleep 60; echo \"Running bench...\"; bench --TTFI-verification --url http://localhost:7861 --ttfi-gpu-type \"RTX 4090\" --ttfi-num-batches 1 --ttfi-batch 30 --ttfi-first-seed"
           ],
           "image": "docker.io/nosana/sd-forge-bench:0.2.9.6",
           "gpu": true,
