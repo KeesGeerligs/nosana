@@ -14,7 +14,7 @@
                     "-c",
                     "echo \"Starting NN server...\"; nn_server"
                 ],
-                "image": "docker.io/nosana/nn_server:0.0.0",
+                "image": "docker.io/nosana/nn_server:0.0.1",
                 "gpu": true,
                 "expose": 8000
             }
