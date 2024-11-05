@@ -12,9 +12,9 @@
           "cmd": [
             "/bin/sh",
             "-c",
-            "echo \"Running bench...\"; bench --benchmark generic --check-specs --version 0.0.0"
+            "echo \"Running bench...\"; bench --benchmark generic --check-specs --version v1.0.0"
           ],
-          "image": "docker.io/nosana/sd-auto-bench:0.2.0.9.2",
+          "image": "docker.io/nosana/nn:1.0.0",
           "gpu": true
         },
         "results": {
