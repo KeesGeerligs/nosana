@@ -7,7 +7,7 @@
   "ops": [
     {
       "type": "container/run",
-      "id": "nn-benchmark",
+      "id": "benchmark-nn",
       "args": {
         "cmd": [
           "/bin/bash",
@@ -22,14 +22,12 @@
         }
       },
       "results": {
-        "nn_benchmark_results_1": "(?<=NN benchmark results with 1000 samples: ).*",
-        "nn_benchmark_results_2": "(?<=NN benchmark results with 5000 samples: ).*",
-        "system_specs": "(?<=system specs: ).*"
+        "nn_benchmark": "(?<=NN benchmark results with 1000 samples: ).*"
       }
     },
     {
       "type": "container/run",
-      "id": "ttfi-info",
+      "id": "benchmark-llm",
       "args": {
         "cmd": [
           "/bin/bash",

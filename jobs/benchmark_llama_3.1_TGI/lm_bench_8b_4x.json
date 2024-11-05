@@ -2,20 +2,19 @@
   "version": "0.1",
   "type": "container",
   "meta": {
-    "trigger": "cli"
+    "trigger": "benchmark"
   },
   "ops": [
     {
       "type": "container/run",
-      "id": "TGI-llama3.1",
+      "id": "LMDeploy-llama3.1",
       "args": {
-        "entrypoint": [],
         "cmd": [
-          "/bin/bash",
+          "/bin/sh",
           "-c",
-          "text-generation-launcher --model-id ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --quantize awq --port 8080 > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8080 --ping_correction --job-length 900 --model llama3.1_8B_4x --timeout 10 --llm-framework tgi"
+          "echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1_8B_4x --chat-template /chat_template.json --model-format awq > /dev/null & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 10 --model llama3.1_8B_4x --timeout 10 --llm-framework lmdeploy"
         ],
-        "image": "docker.io/nosana/llm_benchmark-tgi:0.2.0",
+        "image": "docker.io/nosana/llm_benchmark-lmdeploy:0.2.0.1",
         "gpu": true,
         "resources": [
           {
