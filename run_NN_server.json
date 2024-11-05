@@ -12,11 +12,13 @@
                 "cmd": [
                     "/bin/sh",
                     "-c",
-                    "echo \"Starting NN server...\"; nn_server"
+                    "echo \"Starting NN server...\"; nn_server > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark nn --url http://localhost:8000 --job-length 50 --num-samples-list 1000 2000 --version 0.0.0"
                 ],
-                "image": "docker.io/nosana/nn_server:0.0.1",
-                "gpu": true,
-                "expose": 8000
+                "image": "docker.io/nosana/nn:0.0.9.9.1",
+                "gpu": true
+            },
+            "results": {
+              "results_NN_benchmark": "(?<=NN benchmark results: ).*"
             }
         }
     ]
