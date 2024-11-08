@@ -1,0 +1,31 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+        "trigger": "cli"
+    },
+    "ops": [
+        {
+            "type": "container/run",
+            "id": "nn_anti_spoof",
+            "args": {
+                "cmd": [
+                    "/bin/sh",
+                    "-c",
+                    "python anti_spoof_v2.py"
+                ],
+                "image": "docker.io/nosana/anti-spoof-v2:1.0.0",
+                "gpu": true,
+                "env": {
+                    "SEED": "4245643633",
+                    "NUM_SAMPLES": "1000",
+                    "HIDDEN_SIZE": "9000",
+                    "NUM_LAYERS": "5"
+                }
+            },
+            "results": {
+              "prediction": "(?<=Encrypted Prediction: ).*"
+            }
+        }
+    ]
+}
