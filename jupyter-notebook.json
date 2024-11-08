@@ -1,3 +1,4 @@
+
 {
     "version": "0.1",
     "type": "container",
@@ -20,7 +21,7 @@
                     "--NotebookApp.password=''"
                 ],
                 "expose": 8888,
-                "image": "docker.io/nosana/nosana_workshop:0.0.2",
+                "image": "docker.io/nosana/workshop:SD3-LoRA",
                 "gpu": true
             }
     }
