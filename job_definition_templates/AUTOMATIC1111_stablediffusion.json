@@ -7,20 +7,20 @@
     "ops": [
       {
         "type": "container/run",
-        "id": "forge_stablediffusion",
+        "id": "auto1111_stablediffusion",
         "args": {
           "cmd": [
             "/bin/sh", "-c", 
-            "echo \"Starting benchmarking service...\"; python -u launch.py --api --listen --pytorch-deterministic --port 7861 --disable-xformers"
+            "python -u launch.py --listen --port 7860 --api"
           ],
-          "image": "docker.io/nosana/sd-forge-bench:0.2.9.6",
+          "image": "docker.io/nosana/automatic1111:0.0.1",
           "gpu": true,
-          "expose": 7861,
+          "expose": 7860,
           "resources": [
             {
               "type": "S3",
               "url": "https://models.nosana.io/stable-diffusion/1.5",
-              "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
+              "target": "/stable-diffusion-webui/models/Stable-diffusion"
             }
           ]
           
