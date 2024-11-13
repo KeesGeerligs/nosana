@@ -12,7 +12,10 @@
           "image": "docker.io/atinoda/text-generation-webui:latest",
           "cmd": [],
           "gpu": true,
-          "expose": 7860
+          "expose": 7860,
+          "env": {
+            "EXTRA_LAUNCH_ARGS": "--listen --verbose"
+          }
         }
       }
     ]

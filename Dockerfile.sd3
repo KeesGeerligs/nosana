@@ -1,0 +1,4 @@
+FROM nosana/pytorch-jupyter-notebook:0.0.1
+
+# Copy the local model folder into the container
+COPY ./models--stabilityai--stable-diffusion-3-medium-diffusers /root/.cache/huggingface/hub/models--stabilityai--stable-diffusion-3-medium-diffusers
