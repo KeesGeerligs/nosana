@@ -1,5 +1,4 @@
 FROM docker.io/pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 
-# Install Jupyter
 RUN pip install --no-cache-dir jupyter
 
