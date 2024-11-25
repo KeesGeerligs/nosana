@@ -1,0 +1,22 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "cli"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "coqui-tts-service",
+      "args": {
+        "image": "ghcr.io/coqui-ai/tts-cpu",
+        "entrypoint": "/bin/bash",
+        "cmd": [
+          "-c",
+          "python3 TTS/server/server.py --model_name tts_models/en/ljspeech/vits --vocoder_name vocoder_models/en/ljspeech/hifigan_v2"
+        ],
+        "expose": 5002
+      }
+    }
+  ]
+}
