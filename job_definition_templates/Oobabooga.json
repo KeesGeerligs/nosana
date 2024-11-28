@@ -14,7 +14,7 @@
           "gpu": true,
           "expose": 7860,
           "env": {
-            "EXTRA_LAUNCH_ARGS": "--listen --verbose"
+            "EXTRA_LAUNCH_ARGS": "--listen --verbose --api"
           }
         }
       }
