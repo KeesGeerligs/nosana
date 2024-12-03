@@ -1,0 +1,33 @@
+{
+    "version": "0.1",
+    "type": "container",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "type": "container/run",
+        "id": "vllm",
+        "args": {
+            "entrypoint": ["python3", "-m", "vllm.entrypoints.openai.api_server"],
+            "cmd": [
+              "--model",
+              "/data-models/Qwen2.5-3B-Instruct-AWQ/snapshots/3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd",
+              "--served-model-name",
+              "Qwen/Qwen2.5-3B-Instruct-AWQ",
+              "--quantization", "awq"
+            ],
+          "image": "docker.io/vllm/vllm-openai:v0.5.4",
+          "gpu": true,
+          "expose": 8000,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "https://models.nosana.io/hugging-face/qwen2/models--Qwen--Qwen2.5-3B-Instruct-AWQ/",
+              "target": "/data-models/Qwen2.5-3B-Instruct-AWQ"
+            }
+          ]
+        }
+      }
+    ]
+  }
