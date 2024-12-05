@@ -1,0 +1,12 @@
+{
+  "name": "nosana-history",
+  "version": "1.0.0",
+  "description": "Fetch Nosana transaction history",
+  "main": "history.js",
+  "scripts": {
+    "start": "node history.js"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.87.6"
+  }
+} 
