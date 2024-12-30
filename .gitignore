@@ -3,3 +3,4 @@ llm-bench/
 automatic_CU_benchmarks/LMDeploy_Llama31/generic_LMDeploy/nos_bench/
 scraper/snapshots/09-08-mainnet-jobs.json
 data/benchmark_data.json
+test/
