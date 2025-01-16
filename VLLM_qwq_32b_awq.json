@@ -12,11 +12,16 @@
             "entrypoint": ["python3", "-m", "vllm.entrypoints.openai.api_server"],
             "cmd": [
               "--model",
-              "Qwen/QwQ-32B-Preview",
+              "KirillR/QwQ-32B-Preview-AWQ",
+              "--quantization",
+              "awq_marlin",
               "--served-model-name",
-              "QwQ-32B-Preview"
+              "QwQ-32B-Preview",
+              "--trust-remote-code", 
+              "--tokenizer-mode",
+              "auto"
             ],
-          "image": "docker.io/vllm/vllm-openai:v0.5.4",
+          "image": "docker.io/vllm/vllm-openai:latest",
           "gpu": true,
           "expose": 8000
         }
