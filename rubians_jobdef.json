@@ -1,0 +1,37 @@
+{
+    "type": "container",
+    "version": "0.1",
+    "meta": {
+      "trigger": "cli"
+    },
+    "ops": [
+      {
+        "id": "rubians-comfyui",
+        "type": "container/run",
+        "args": {
+          "cmd": [],
+          "entrypoint": ["bash", "/custom-scripts/entrypoint.sh"],
+          "gpu": true,
+          "image": "yanwk/comfyui-boot:cu124-slim-20250120",
+          "expose": 8188,
+          "resources": [
+            {
+              "type": "S3",
+              "url": "https://models.nosana.io/rubians/resources",
+              "target": "/root/models"
+            },
+            {
+              "type": "S3",
+              "url": "https://models.nosana.io/rubians/inputs",
+              "target": "/root/inputs"
+            },
+            {
+              "type": "S3",
+              "url": "https://models.nosana.io/rubians/entrypoint",
+              "target": "/custom-scripts"
+            }
+          ]
+        }
+      }
+    ]
+  }

@@ -1,0 +1,23 @@
+{
+    "ops": [
+      {
+        "id": "openai-whisper-asr-webservice",
+        "args": {
+          "cmd": [],
+          "env": {
+            "ASR_MODEL": "base",
+            "ASR_ENGINE": "openai_whisper"
+          },
+          "gpu": true,
+          "image": "docker.io/onerahmet/openai-whisper-asr-webservice:latest-gpu",
+          "expose": 9000
+        },
+        "type": "container/run"
+      }
+    ],
+    "meta": {
+      "trigger": "cli"
+    },
+    "type": "container",
+    "version": "0.1"
+  }
