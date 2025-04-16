@@ -1,0 +1,28 @@
+{
+    "ops": [
+      {
+        "id": "scout",
+        "args": {
+          "cmd": [
+            "/bin/sh",
+            "-c",
+            "vllm serve meta-llama/Llama-4-Scout-17B-16E-Instruct --tensor-parallel-size 8 --max-model-len 1000000 --override-generation-config='{\"attn_temperature_tuning\": true}'"
+          ],
+          "env": {
+            "HF_TOKEN": "x",
+            "VLLM_DISABLE_COMPILE_CACHE": "1"
+          },
+          "gpu": true,
+          "image": "docker.io/vllm/vllm-openai:v0.8.4",
+          "expose": 9000,
+          "entrypoint": []
+        },
+        "type": "container/run"
+      }
+    ],
+    "meta": {
+      "trigger": "dashboard"
+    },
+    "type": "container",
+    "version": "0.1"
+  }

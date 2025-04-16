@@ -1,0 +1,135 @@
+{
+  "6": {
+    "inputs": {
+      "text": "A young woman with long, messy blonde hair and striking blue eyes, her features delicate yet expressive, stands in an opulent Victorian dining room. She has massive, fluffy fennec-like ears and a voluminous, soft tail, both blending seamlessly into her elegant appearance. She is dressed in a sophisticated maid outfit consisting of a long, flowing black dress adorned with intricate gold leaf embroidery, a crisp white apron, and lace-trimmed cuffs. Her lips are slightly parted as she carefully places an elaborate Black Forest cake, adorned with cherries and candles, onto a grand, dark wooden dining table.\n\nThe room exudes an air of wealth and mystery, with dim candlelight flickering from ornate candelabras. The rich mahogany paneling of the walls is adorned with large, antique oil paintings in gilded frames, their subjects lost in the shadows. A massive crystal chandelier hangs overhead, its glow reflecting off silverware and fine china set meticulously on the table. Through tall, arched windows, a foggy forest is visible in the pale moonlight, adding an eerie yet enchanting atmosphere to the scene. The air is thick with the scent of aged wood, wax, and the faint sweetness of the freshly baked cake, enhancing the immersive and gothic elegance of the moment.",
+      "clip": [
+        "30",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive Prompt)"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "31",
+        0
+      ],
+      "vae": [
+        "30",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "9": {
+    "inputs": {
+      "filename_prefix": "flux/img_",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "27": {
+    "inputs": {
+      "width": [
+        "43",
+        1
+      ],
+      "height": [
+        "43",
+        2
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptySD3LatentImage",
+    "_meta": {
+      "title": "EmptySD3LatentImage"
+    }
+  },
+  "30": {
+    "inputs": {
+      "ckpt_name": "flux1-schnell-fp8.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "31": {
+    "inputs": {
+      "seed": 795461935354263,
+      "steps": 20,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "30",
+        0
+      ],
+      "positive": [
+        "35",
+        0
+      ],
+      "negative": [
+        "33",
+        0
+      ],
+      "latent_image": [
+        "27",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "33": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "30",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Negative Prompt)"
+    }
+  },
+  "35": {
+    "inputs": {
+      "guidance": 3.5,
+      "conditioning": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "FluxGuidance"
+    }
+  },
+  "43": {
+    "inputs": {
+      "aspect_ratio": "3:4"
+    },
+    "class_type": "SDXLAspectRatioSelector",
+    "_meta": {
+      "title": "SDXL Aspect Ratio"
+    }
+  }
+}

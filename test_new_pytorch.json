@@ -1,0 +1,241 @@
+{
+  "version": "0.1",
+  "type": "container",
+  "meta": {
+    "trigger": "benchmark"
+  },
+  "ops": [
+    {
+      "type": "container/run",
+      "id": "generic_benchmark",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running bench...\"; bench --benchmark generic --check-specs --check-gpu --version v1.0.0"
+        ],
+        "image": "k1llahkeezy/nn:0.2.0",
+        "gpu": true,
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_generic_benchmark": "(?<=Generic benchmark results: ).*",
+        "results_system_specs": "(?<=System specs: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "nn_benchmark",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting NN server...\"; nn_server > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark nn --url http://localhost:8000 --job-length 65 --num-samples-list 1000 5000 --check-gpu --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/nn:0.2.0",
+        "gpu": true,
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_nn_benchmark": "(?<=NN benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "bench-SD-auto",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting benchmarking service...\"; python -u launch.py --listen --port 7860 --allow-code --xformers --enable-insecure-extension-access --api > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --timeout 8 --job-length 65 --model v1-5-pruned-emaonly --model-name stable_diffusion_1.5 --image-framework auto --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/sd-auto-bench:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/stable-diffusion-webui/models/Stable-diffusion"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_image_benchmark": "(?<=Image benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "bench-SD-comfy",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting benchmarking service...\"; python -u main.py --listen --port 7860 > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7860 --job-length 65 --model v1-5-pruned-emaonly.safetensors --model-name stable_diffusion_1.5 --image-framework comfy --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/sd-comfy-bench:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/comfyui/models/checkpoints"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_image_benchmark": "(?<=Image benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "bench-SD-forge",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting benchmarking service...\"; python launch.py --nowebui --api > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:7861 --job-length 65 --model v1-5-pruned-emaonly --model-name stable_diffusion_1.5 --image-framework forge --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/sd-forge-bench:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/opt/stable-diffusion-webui-forge/models/Stable-diffusion"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_image_benchmark": "(?<=Image benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "bench-SD-invoke",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting benchmarking service...\" && invokeai-web > /dev/null 2>&1 & sleep 30; echo \"Running bench...\"; bench --benchmark image --url http://localhost:9090 --model \"v1-5-pruned-emaonly.safetensors\" --model-name stable_diffusion_1.5 --job-length 65 --image-framework invokeai --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/sd-invoke-bench:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/stable-diffusion/1.5",
+            "target": "/invokeai/models/stable-diffusion"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_image_benchmark": "(?<=Image benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "lmdepoy_llama_8b_4x",
+      "args": {
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then echo \"Starting lmdeploy service...\"; lmdeploy serve api_server ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --model-name llama3.1_8B_4x --chat-template /chat_template.json --model-format awq > /dev/null 2>&1 & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:23333 --ping_correction --job-length 65 --model llama3.1_8B_4x --timeout 10 --llm-framework lmdeploy --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/llm_benchmark-lmdeploy:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_llm_benchmark": "(?<=LLM benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "tgi_llama_8b_4x",
+      "args": {
+        "entrypoint": [],
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then text-generation-launcher --model-id ../../root/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --quantize awq --port 8080 > /dev/null 2>&1 & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8080 --ping_correction --job-length 65 --model llama3.1_8B_4x --timeout 10 --llm-framework tgi --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/llm_benchmark-tgi:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_llm_benchmark": "(?<=LLM benchmark results: ).*"
+      }
+    },
+    {
+      "type": "container/run",
+      "id": "vllm_llama_8b_4x",
+      "args": {
+        "entrypoint": [],
+        "cmd": [
+          "/bin/bash",
+          "-c",
+          "echo \"Running gpu check\"; if bench --check-gpu; then python3 -m vllm.entrypoints.openai.api_server --model ../../root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4/snapshots/db1f81ad4b8c7e39777509fac66c652eb0a52f91 --served-model-name llama3.1_8B_4x --quantization awq --max-model-len 2176 > /dev/null 2>&1 & sleep 30 & echo \"Running lm-benchmark...\" & bench --benchmark llm --url http://localhost:8000 --ping_correction --job-length 65 --model llama3.1_8B_4x --timeout 10 --llm-framework vllm --version v1.0.0; else echo \"GPU check failed. Printing nvidia-smi output:\"; nvidia-smi; fi"
+        ],
+        "image": "k1llahkeezy/llm_benchmark-vllm:0.2.0",
+        "gpu": true,
+        "resources": [
+          {
+            "type": "S3",
+            "url": "https://models.nosana.io/hugging-face/llama3.1/8b/4x/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+            "target": "/root/.cache/huggingface/hub/models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4"
+          }
+        ],
+        "env": {
+          "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+          "CUDA_VISIBLE_DEVICES": "0"
+        }
+      },
+      "results": {
+        "results_llm_benchmark": "(?<=LLM benchmark results: ).*"
+      }
+    }
+  ]
+}

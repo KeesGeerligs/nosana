@@ -9,7 +9,7 @@
       "type": "container/run",
       "id": "pytorch",
       "args": {
-        "image": "docker.io/nosana/pytorch-jupyter:0.0.0",
+        "image": "docker.io/k1llahkeezy/jupyter:0.0.0",
         "cmd": [
           "jupyter",
           "notebook",

@@ -1,0 +1,24 @@
+{
+    "ops": [
+      {
+        "id": "vllm",
+        "args": {
+          "cmd": [
+            "/bin/sh",
+            "-c",
+            "python3 -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --served-model-name R1-Qwen-1.5B --port 9000 --max-model-len 130000"
+          ],
+          "gpu": true,
+          "image": "docker.io/vllm/vllm-openai:latest",
+          "expose": 9000,
+          "entrypoint": []
+        },
+        "type": "container/run"
+      }
+    ],
+    "meta": {
+      "trigger": "benchmark"
+    },
+    "type": "container",
+    "version": "0.1"
+  }
