@@ -49,7 +49,7 @@ EXPOSE 8188
 ENV CLI_ARGS=""
 
 # Command to start ComfyUI
-CMD ["python3", "./ComfyUI/main.py", "--listen", "--port", "8188"]
+CMD ["python3", "./ComfyUI/main.py", "--listen", "--port", "8188", "--enable-cors-header"]
 
 
 

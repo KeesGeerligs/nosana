@@ -6,7 +6,7 @@
           "cmd": [
             "/bin/sh",
             "-c",
-            "vllm serve meta-llama/Llama-4-Scout-17B-16E-Instruct --tensor-parallel-size 8 --max-model-len 1000000 --override-generation-config='{\"attn_temperature_tuning\": true}'"
+            "vllm serve meta-llama/Llama-4-Scout-17B-16E-Instruct --tensor-parallel-size 8 --max-model-len 100000 --override-generation-config='{\"attn_temperature_tuning\": true}'"
           ],
           "env": {
             "HF_TOKEN": "x",
